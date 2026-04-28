@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHAI Agentic AI — Unified T&E Framework</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font: 'Segoe UI', system-ui, sans-serif;
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --border: #e2e0d8;
+  --border-strong: #c8c6bc;
+  --text: #1a1916;
+  --text-muted: #6b6960;
+  --text-faint: #9e9c94;
+
+  --tool-bg: #e8f1fb; --tool-border: #a8c8f0; --tool-text: #0d3d6e; --tool-mid: #3575b5;
+  --comp-bg: #e8f5e9; --comp-border: #a5d6a7; --comp-text: #1b5e20; --comp-mid: #2e7d32;
+  --code-bg: #fff8e1; --code-border: #ffe082; --code-text: #6d4c00; --code-mid: #b07800;
+  --data-bg: #fce4ec; --data-border: #f48fb1; --data-text: #880e4f; --data-mid: #c2185b;
+  --ctx-bg:  #ede7f6; --ctx-border: #ce93d8; --ctx-text: #4a148c; --ctx-mid: #7b1fa2;
+  --task-bg: #e0f7fa; --task-border: #80deea; --task-text: #004d40; --task-mid: #00838f;
+
+  --priv-accent: #5b7fff;
+  --liab-accent: #e05252;
+  --inj-accent: #2ea87e;
+  --mal-accent: #e07b20;
+  --third-accent: #8b5cf6;
+  --agent-accent: #0891b2;
+
+  --gap-bg: #fffbeb; --gap-border: #fbbf24; --gap-text: #92400e;
+  --radius: 8px; --radius-sm: 5px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141412; --surface: #1e1d1a; --border: #2e2d28; --border-strong: #404038;
+    --text: #e8e6dc; --text-muted: #9b998e; --text-faint: #6b6960;
+    --tool-bg: #0d2540; --tool-border: #1a4a7a; --tool-text: #90c4f0; --tool-mid: #5a9fd4;
+    --comp-bg: #0d2710; --comp-border: #1a4820; --comp-text: #86c98a; --comp-mid: #4caf50;
+    --code-bg: #261e00; --code-border: #4a3800; --code-text: #ffd180; --code-mid: #e6a817;
+    --data-bg: #2d0a1a; --data-border: #7a2040; --data-text: #f48fb1; --data-mid: #e57399;
+    --ctx-bg:  #1a0d2d; --ctx-border: #5a2880; --ctx-text: #ce93d8; --ctx-mid: #ab47bc;
+    --task-bg: #00201f; --task-border: #004d40; --task-text: #80cbc4; --task-mid: #00897b;
+    --gap-bg: #2d2200; --gap-border: #a07000; --gap-text: #ffd180;
+  }
+}
+
+body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 24px 20px 48px; font-size: 13px; line-height: 1.5; }
+
+.header { margin-bottom: 20px; }
+.header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.chai-badge { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: #0d3d6e; color: #fff; padding: 3px 9px; border-radius: 4px; }
+.header h1 { font-size: 19px; font-weight: 600; letter-spacing: -.3px; margin-bottom: 4px; }
+.header p  { font-size: 12px; color: var(--text-muted); max-width: 820px; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center; }
+.controls-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--text-faint); margin-right: 4px; }
+.btn { font-size: 11px; padding: 4px 11px; border-radius: 20px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-muted); cursor: pointer; transition: all .12s; font-family: var(--font); }
+.btn:hover { background: var(--border); color: var(--text); }
+.btn.active { background: var(--text); color: var(--bg); border-color: var(--text); font-weight: 500; }
+.sep { width: 1px; height: 18px; background: var(--border-strong); margin: 0 4px; }
+
+.legend { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.legend-dash { width: 16px; height: 1px; border-top: 2px dashed var(--gap-border); }
+.legend-divider { width: 1px; height: 16px; background: var(--border-strong); margin: 0 2px; }
+
+.summary { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 22px; }
+.pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+.pill-tool  { background: var(--tool-bg);  color: var(--tool-text);  border-color: var(--tool-border); }
+.pill-comp  { background: var(--comp-bg);  color: var(--comp-text);  border-color: var(--comp-border); }
+.pill-code  { background: var(--code-bg);  color: var(--code-text);  border-color: var(--code-border); }
+.pill-data  { background: var(--data-bg);  color: var(--data-text);  border-color: var(--data-border); }
+.pill-ctx   { background: var(--ctx-bg);   color: var(--ctx-text);   border-color: var(--ctx-border); }
+.pill-task  { background: var(--task-bg);  color: var(--task-text);  border-color: var(--task-border); }
+.pill-all   { background: #f0eeff; color: #4c3b99; border-color: #c4b8f8; }
+.pill-gap   { background: var(--gap-bg);   color: var(--gap-text);   border-color: var(--gap-border); }
+@media (prefers-color-scheme: dark) { .pill-all { background: #1e1840; color: #b8a8f8; border-color: #3d3080; } }
+
+.matrix {
+  display: grid;
+  grid-template-columns: 148px repeat(6, minmax(0,1fr));
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.col-header-spacer { background: var(--bg); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; align-items: flex-end; }
+.col-header-spacer span { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .6px; color: var(--text-faint); }
+
+.col-header { padding: 10px 12px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.col-header:last-child { border-right: none; }
+.col-header h2 { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
+.col-header p  { font-size: 10px; line-height: 1.35; }
+.col-header.tool  { background: var(--tool-bg);  color: var(--tool-text); }
+.col-header.comp  { background: var(--comp-bg);  color: var(--comp-text); }
+.col-header.code  { background: var(--code-bg);  color: var(--code-text); }
+.col-header.data  { background: var(--data-bg);  color: var(--data-text); border-left: 2px solid var(--border-strong); }
+.col-header.ctx   { background: var(--ctx-bg);   color: var(--ctx-text); }
+.col-header.task  { background: var(--task-bg);  color: var(--task-text); }
+
+.row-label { padding: 12px 12px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 3px; }
+.row-label h3 { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.row-label p  { font-size: 10px; color: var(--text-muted); line-height: 1.35; }
+.row-label-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.cell { padding: 8px 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
+.cell:last-child { border-right: none; }
+.cell.last-row { border-bottom: none; }
+.cell.data-col { background: color-mix(in srgb, var(--data-bg) 10%, var(--surface)); border-left: 1px solid var(--data-border); }
+.cell.ctx-col  { background: color-mix(in srgb, var(--ctx-bg)  10%, var(--surface)); }
+.cell.task-col { background: color-mix(in srgb, var(--task-bg) 10%, var(--surface)); }
+@media (prefers-color-scheme: dark) {
+  .cell.data-col { background: color-mix(in srgb, var(--data-bg) 22%, var(--surface)); }
+  .cell.ctx-col  { background: color-mix(in srgb, var(--ctx-bg)  22%, var(--surface)); }
+  .cell.task-col { background: color-mix(in srgb, var(--task-bg) 22%, var(--surface)); }
+}
+
+.risk-priv  .row-label { border-left: 3px solid var(--priv-accent); }
+.risk-liab  .row-label { border-left: 3px solid var(--liab-accent); }
+.risk-inj   .row-label { border-left: 3px solid var(--inj-accent); }
+.risk-mal   .row-label { border-left: 3px solid var(--mal-accent); }
+.risk-third .row-label { border-left: 3px solid var(--third-accent); }
+.risk-agent .row-label { border-left: 3px solid var(--agent-accent); }
+
+.metric-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 8px; margin-bottom: 5px; background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s; display: none; }
+.metric-card:last-child { margin-bottom: 0; }
+.metric-card:hover { border-color: var(--border-strong); background: var(--bg); }
+.metric-card.visible { display: block; }
+.metric-card.expanded .card-body { display: block; }
+
+.card-name { font-size: 11px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 2px; }
+.card-tag  { font-size: 10px; color: var(--text-faint); }
+.card-body { display: none; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
+.card-body p { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 5px; }
+.card-bench { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; display: inline-block; }
+.card-bench.tool  { background: var(--tool-bg); color: var(--tool-text); }
+.card-bench.comp  { background: var(--comp-bg); color: var(--comp-text); }
+.card-bench.code  { background: var(--code-bg); color: var(--code-text); }
+.card-bench.data  { background: var(--data-bg); color: var(--data-text); }
+.card-bench.ctx   { background: var(--ctx-bg);  color: var(--ctx-text); }
+.card-bench.task  { background: var(--task-bg); color: var(--task-text); }
+.card-bench.all   { background: #f0eeff; color: #4c3b99; }
+@media (prefers-color-scheme: dark) { .card-bench.all { background: #1e1840; color: #b8a8f8; } }
+
+.gap-card { border: 1px dashed var(--gap-border); border-radius: var(--radius-sm); padding: 6px 8px; margin-bottom: 5px; background: var(--gap-bg); cursor: pointer; transition: opacity .12s; display: none; }
+.gap-card:last-child { margin-bottom: 0; }
+.gap-card:hover { opacity: .85; }
+.gap-card.visible { display: block; }
+.gap-card.expanded .card-body { display: block; }
+.gap-card .card-name { color: var(--gap-text); }
+.gap-card .card-tag  { color: #b45309; font-size: 10px; }
+@media (prefers-color-scheme: dark) { .gap-card .card-tag { color: #d4a017; } }
+.gap-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gap-text); margin-right: 4px; opacity: .7; }
+
+.universal-section { margin-bottom: 32px; }
+.universal-section h2 { font-size: 14px; font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.universal-section > p { font-size: 12px; color: var(--text-muted); margin-bottom: 14px; }
+.universal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px,1fr)); gap: 8px; }
+.universal-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 11px; background: var(--surface); cursor: pointer; transition: border-color .12s; display: none; }
+.universal-card.visible { display: block; }
+.universal-card:hover { border-color: var(--border-strong); }
+.universal-card.expanded .card-body { display: block; }
+.universal-card .card-name { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.universal-card .card-tag  { font-size: 10px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <span class="chai-badge">CHAI</span>
+    <h1>Agentic AI — Unified T&amp;E Framework</h1>
+  </div>
+  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>6 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories — T&amp;E coverage gaps for these are marked explicitly. Click any card to expand details. Gap cards identify where evaluation coverage is missing.</p>
+</div>
+
+<div class="controls">
+  <span class="controls-label">Filter by principle</span>
+  <button class="btn active" onclick="filterCat(this,'all')">All</button>
+  <button class="btn" onclick="filterCat(this,'safety')">Safety &amp; Reliability</button>
+  <button class="btn" onclick="filterCat(this,'efficacy')">Efficacy</button>
+  <button class="btn" onclick="filterCat(this,'efficiency')">Efficiency</button>
+  <button class="btn" onclick="filterCat(this,'transparency')">Transparency</button>
+  <button class="btn" onclick="filterCat(this,'fairness')">Fairness &amp; Bias</button>
+  <button class="btn" onclick="filterCat(this,'usability')">Usability</button>
+  <div class="sep"></div>
+  <button class="btn active" id="gap-toggle" onclick="toggleGaps(this)">Show gaps</button>
+</div>
+
+<div class="summary" id="summary-bar"></div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--tool-mid)"></div> Tool Calling</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--comp-mid)"></div> Computer Use</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--code-mid)"></div> Code Gen &amp; Exec</div>
+  <div class="legend-divider"></div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--data-mid)"></div> Data Interaction</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--ctx-mid)"></div> Context &amp; Hand-off</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--task-mid)"></div> Task Execution</div>
+  <div class="legend-divider"></div>
+  <div class="legend-item"><div class="legend-dot" style="background:#6d5ad4"></div> All types</div>
+  <div class="legend-item"><div class="legend-dash"></div> Coverage gap</div>
+</div>
+
+<!-- MATRIX -->
+<div class="matrix">
+
+  <div class="col-header-spacer"><span>Risk domain ↓ &nbsp; Action type →</span></div>
+  <div class="col-header tool"><h2>Tool Calling</h2><p>Pre-defined API/MCP calls. Bounded &amp; auditable.</p></div>
+  <div class="col-header comp"><h2>Computer Use</h2><p>Screen nav, clicks, typing. Broad action space.</p></div>
+  <div class="col-header code"><h2>Code Gen &amp; Exec</h2><p>Writes &amp; runs novel code. Hardest to audit.</p></div>
+  <div class="col-header data"><h2>Data Interaction</h2><p>How agents access &amp; interpret healthcare data.</p></div>
+  <div class="col-header ctx"><h2>Context &amp; Hand-off</h2><p>How information is structured for humans &amp; other agents.</p></div>
+  <div class="col-header task"><h2>Task Execution</h2><p>How agents perform real workflows &amp; deliverables.</p></div>
+
+  <!-- ROW 1: Data Privacy -->
+  <div class="row-label risk-priv">
+    <h3><span class="row-label-dot" style="background:var(--priv-accent)"></span>Data Privacy</h3>
+    <p>Access scope, exposure, least-privilege</p>
+  </div>
+  <div class="cell" id="priv-tool"></div>
+  <div class="cell" id="priv-comp"></div>
+  <div class="cell" id="priv-code"></div>
+  <div class="cell data-col" id="priv-data"></div>
+  <div class="cell ctx-col"  id="priv-ctx"></div>
+  <div class="cell task-col" id="priv-task"></div>
+
+  <!-- ROW 2: Liability -->
+  <div class="row-label risk-liab">
+    <h3><span class="row-label-dot" style="background:var(--liab-accent)"></span>Liability &amp; Irreversibility</h3>
+    <p>Accountability, irreversible actions, oversight</p>
+  </div>
+  <div class="cell" id="liab-tool"></div>
+  <div class="cell" id="liab-comp"></div>
+  <div class="cell" id="liab-code"></div>
+  <div class="cell data-col" id="liab-data"></div>
+  <div class="cell ctx-col"  id="liab-ctx"></div>
+  <div class="cell task-col" id="liab-task"></div>
+
+  <!-- ROW 3: Prompt Injection -->
+  <div class="row-label risk-inj">
+    <h3><span class="row-label-dot" style="background:var(--inj-accent)"></span>Prompt Injection</h3>
+    <p>Adversarial robustness, hijacked behavior</p>
+  </div>
+  <div class="cell" id="inj-tool"></div>
+  <div class="cell" id="inj-comp"></div>
+  <div class="cell" id="inj-code"></div>
+  <div class="cell data-col" id="inj-data"></div>
+  <div class="cell ctx-col"  id="inj-ctx"></div>
+  <div class="cell task-col" id="inj-task"></div>
+
+  <!-- ROW 4: Malicious Use -->
+  <div class="row-label risk-mal">
+    <h3><span class="row-label-dot" style="background:var(--mal-accent)"></span>Malicious Use</h3>
+    <p>Harmful outputs, weaponizable capabilities</p>
+  </div>
+  <div class="cell" id="mal-tool"></div>
+  <div class="cell" id="mal-comp"></div>
+  <div class="cell" id="mal-code"></div>
+  <div class="cell data-col" id="mal-data"></div>
+  <div class="cell ctx-col"  id="mal-ctx"></div>
+  <div class="cell task-col" id="mal-task"></div>
+
+  <!-- ROW 5: Third-Party -->
+  <div class="row-label risk-third">
+    <h3><span class="row-label-dot" style="background:var(--third-accent)"></span>Third-Party &amp; Supply Chain</h3>
+    <p>External tools, APIs, data source trust</p>
+  </div>
+  <div class="cell" id="third-tool"></div>
+  <div class="cell" id="third-comp"></div>
+  <div class="cell" id="third-code"></div>
+  <div class="cell data-col" id="third-data"></div>
+  <div class="cell ctx-col"  id="third-ctx"></div>
+  <div class="cell task-col" id="third-task"></div>
+
+  <!-- ROW 6: Agent-to-Agent -->
+  <div class="row-label risk-agent">
+    <h3><span class="row-label-dot" style="background:var(--agent-accent)"></span>Agent-to-Agent</h3>
+    <p>Multi-agent interactions, coordination, error propagation</p>
+  </div>
+  <div class="cell last-row" id="agent-tool"></div>
+  <div class="cell last-row" id="agent-comp"></div>
+  <div class="cell last-row" id="agent-code"></div>
+  <div class="cell last-row data-col" id="agent-data"></div>
+  <div class="cell last-row ctx-col"  id="agent-ctx"></div>
+  <div class="cell last-row task-col" id="agent-task"></div>
+
+</div>
+
+<!-- UNIVERSAL METRICS -->
+<div class="universal-section">
+  <h2>
+    <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#6d5ad4;"></span>
+    Cross-cutting metrics — verified to apply across all 6 action types
+  </h2>
+  <p>Only metrics whose definition in the CHAI T&amp;E framework is mechanism-agnostic are listed here. Metrics specific to multi-agent interactions, a single interface type, or a clinical sub-domain are placed in their respective cells above.</p>
+  <div class="universal-grid" id="universal-grid"></div>
+</div>
+
+<script>
+/*
+  MAPPING RULES APPLIED:
+  - Every metric must exist verbatim in the CHAI T&E CSV.
+  - col must match the actual mechanism described in the CSV source paper.
+  - risk domain must be the primary risk surfaced by the metric, not a secondary concern.
+  - "all" col only used when the CSV description is mechanism-agnostic and applies to every
+    one of the 6 action types. Multi-agent-specific and domain-specific metrics are NOT "all".
+  - CHAI skill columns (data/ctx/task) contain only gap cards — no T&E metrics exist for them yet.
+*/
+
+const METRICS = [
+
+  /* ── TOOL CALLING ──────────────────────────────────────────────────
+     Metrics whose CSV source explicitly involves API/MCP/tool invocation.
+  ─────────────────────────────────────────────────────────────────── */
+
+  // risk: liab — wrong invocation completes the wrong task; accountability for the outcome
+  { name:"Tool Invocation Correctness (TIC)", abbr:"TIC", col:"tool", cat:"safety", risk:"liab",
+    desc:"Syntactic and semantic correctness of tool calls via AST/schema matching. Incorrect invocations execute an unintended action — even if the agent 'tried' to do the right thing, the wrong API call produces a wrong, potentially irreversible outcome.",
+    bench:"TIC ≥ 0.85 exact-match against ground-truth function calls" },
+
+  // risk: liab — failed execution means the intended task was not completed; accountability gap
+  { name:"Tool Execution Success Rate (TESR)", abbr:"TESR", col:"tool", cat:"safety", risk:"liab",
+    desc:"Proportion of tool-augmented runs where the tool call executes without error and returns a valid, parseable output. Execution failure breaks the task chain — downstream steps act on no data or stale state, creating accountability gaps.",
+    bench:"TESR ≥ 0.90 across tool-augmented tasks" },
+
+  { name:"Task Completion Rate with Tool Use (TCR-T)", abbr:"TCR-T", col:"tool", cat:"efficacy", risk:"liab",
+    desc:"Whether the agent achieves the correct end goal after tool interactions — evaluated on final environment state, not intermediate steps. Primary liability signal: did the tool-driven action actually accomplish what was authorized?",
+    bench:"TCR-T ≥ 0.75 on multi-step tool-use benchmarks" },
+
+  { name:"Business Policy Adherence Rate (BPAR)", abbr:"BPAR", col:"tool", cat:"safety", risk:"liab",
+    desc:"Proportion of multi-turn agentic interactions completed without any policy-violating tool action (e.g. unauthorized refunds, bypassed verification). Directly measures liability exposure from autonomous tool use in regulated workflows.",
+    bench:"Multi-domain enterprise benchmark; GPT-4o <50% on retail domain" },
+
+  { name:"Escalation Rate (ESR)", abbr:"ESR", col:"tool", cat:"safety", risk:"liab",
+    desc:"Proportion of agent interactions transferred to a live human agent. In tool-calling contexts this is the primary human-oversight signal: the agent recognizes it cannot safely proceed and escalates before taking an irreversible action.",
+    bench:"Escalation-based fallback pipelines reduced agent failure rates ~50% on tau-bench" },
+
+  // risk: inj — noise injection into tool responses is the primary proxy for injection robustness in tool-calling
+  { name:"Noise-Induced Performance Degradation (NIPD)", abbr:"NIPD", col:"tool", cat:"safety", risk:"inj",
+    desc:"Drop in task success rate when controlled noise is injected into user inputs or tool responses. The closest available proxy for prompt injection robustness in tool-calling agents — adversarial tool responses are the tool-calling injection vector.",
+    bench:"NIPD ≤ 10 percentage point drop under controlled noise injection" },
+
+  // risk: priv — output boundary violations directly disclose data that should be private
+  { name:"Output Constraint Violation Rate (OCVR)", abbr:"OCVR", col:"tool", cat:"safety", risk:"priv",
+    desc:"Proportion of turns where agent output violates a predefined output boundary policy — e.g. surfacing internal reasoning, disclosing slot values (DOB, insurance ID) outside the confirmed flow. Direct data privacy metric for voice/dialog agents.",
+    bench:"Target 0% critical violations" },
+
+  { name:"Hard Turn Limit Compliance Rate (HTLCR)", abbr:"HTLCR", col:"tool", cat:"safety", risk:"liab",
+    desc:"Proportion of calls where the agent triggers a handoff before the defined maximum turn count. Prevents runaway context-overflow loops where the agent keeps attempting tool calls beyond any auditable scope.",
+    bench:"Target 100% compliance; no validated production benchmark in peer-reviewed literature" },
+
+  // risk: liab — no trace means no accountability investigation is possible after an incident
+  { name:"End-to-End Trace Coverage Rate", abbr:"E2E-Trace", col:"tool", cat:"transparency", risk:"liab",
+    desc:"All call events — intake, intent classification, tool calls, slot actions, escalations, confirmations — logged with session ID, span ID, timestamp, and output. Zero-gap tracing is the foundation of any liability investigation. Without it, accountability is impossible.",
+    bench:"100% session coverage; HIPAA 6-year retention" },
+
+  // risk: mal — independent parallel classifier catches dangerous outputs before delivery
+  { name:"Real-Time Oversight / Independent Output Monitoring Rate", abbr:"RTM", col:"tool", cat:"safety", risk:"mal",
+    desc:"A secondary classifier operates in parallel on every agent turn, evaluating for predefined dangerous output patterns before delivery. Explicitly independent of the primary agent to avoid self-monitoring failure modes that enable malicious output.",
+    bench:"Target 100% call coverage; proxy benchmark from AI oversight detection literature" },
+
+  // risk: priv — misextracted PII slots (DOB, insurance ID) create direct exposure
+  { name:"Slot Extraction F1 (SEF1)", abbr:"SEF1", col:"tool", cat:"efficacy", risk:"priv",
+    desc:"Harmonic mean of precision and recall for entity-level slot extraction by a conversational agent. Misextracted PII fields — date of birth, insurance ID, medication names — create both accuracy failures and data privacy exposure.",
+    bench:"SEF1 ≥ 0.74 on held-out conversational dialogue" },
+
+  // risk: liab — stochastic failures on financial tool tasks create undisclosed liability exposure
+  { name:"Pass@k Reliability for Agentic Financial Tasks", abbr:"Pass@k", col:"tool", cat:"safety", risk:"liab",
+    desc:"Probability the agent succeeds at least once over k independent runs with identical inputs. Single-run reporting dramatically overstates reliability; stochastic failures on financial tool tasks are a hidden liability exposure.",
+    bench:"Pass@k ≥ 0.90 for k=5 repeated runs on identical financial tasks" },
+
+  // risk: third — agent must retrieve and verify external data; incorrect retrieval = decision on bad data
+  { name:"Decision Accuracy Under Incomplete Information", abbr:"DAUII", col:"tool", cat:"efficacy", risk:"third",
+    desc:"Proportion of tasks where the agent correctly identifies missing information, retrieves it from external sources, and produces the correct decision. Tests whether agents verify third-party data rather than acting on assumptions.",
+    bench:"Best-performing models ~46–48% accuracy on finance agent benchmarks" },
+
+  { name:"Node-Level Regression Test Coverage Rate", abbr:"NLTCR", col:"tool", cat:"safety", risk:"liab",
+    desc:"Each discrete decision node in the scheduling workflow is assigned a locked regression test suite. Coverage = nodes with active versioned test suites / total nodes. 100% required before any model or prompt update goes to production.",
+    bench:"100% node coverage required before production promotion; no peer-reviewed threshold" },
+
+  // risk: third — NLP-to-structured-data translation feeds an external scheduling system
+  { name:"Top-k Symptom-to-Visit Type Mapping Accuracy", abbr:"TopK-SVT", col:"tool", cat:"efficacy", risk:"third",
+    desc:"Whether the correct visit type derived from patient natural language appears within the top-k predicted outputs. Tests NLP-to-structured-data translation quality for scheduling tool calls that feed external third-party booking systems.",
+    bench:"83% precision for classification of patient-generated health text" },
+
+  { name:"Legal Agent Intermediate Progress Rate (LAIPR)", abbr:"LAIPR", col:"tool", cat:"efficacy", risk:"liab",
+    desc:"Proportion of intermediate reasoning and tool-invocation steps correctly completed before reaching a final answer on multi-hop legal tasks. Distinguishes partial completion from total failure — critical in regulated legal environments.",
+    bench:"LegalAgentBench: GPT-4o (ReAct) ~28% success rate, ~55% intermediate progress rate" },
+
+  // risk: third — TSA is the first gate before any external API is called; wrong tool = wrong system
+  { name:"Tool Selection Accuracy (TSA)", abbr:"TSA", col:"tool", cat:"safety", risk:"third",
+    desc:"Proportion of decisions where the agent selects the correct tool from a candidate set that includes distractors. The first-order control for third-party risk: selecting the wrong tool misdirects a real API call to an unintended external system.",
+    bench:"TSA ≥ 0.80 across representative tool-use benchmarks" },
+
+
+  /* ── COMPUTER USE ──────────────────────────────────────────────────
+     Metrics whose CSV source involves UI navigation, voice, screen interaction,
+     or real-time clinical interface use.
+  ─────────────────────────────────────────────────────────────────── */
+
+  // MedAgentBench: FHIR-compliant EHR environment — a computer interface, not pure tool API
+  { name:"Task Success Rate — MedAgentBench", abbr:"MedAgent-TSR", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Multi-step clinical task completion rate in a realistic virtual EHR environment. The EHR is a computer interface the agent navigates; incorrect completion of clinical tasks (medication orders, lab reviews) is directly irreversible and creates liability.",
+    bench:"Target ≥ 65% overall task success rate" },
+
+  // TLSCAS: CDS — clinical decision support system is a computer interface
+  { name:"Task-Level Safety & Clinical Accuracy (TLSCAS)", abbr:"TLSCAS", col:"comp", cat:"safety", risk:"liab",
+    desc:"Percentage of agentic CDS actions that are both clinically safe and clinically accurate. CDS is delivered through a computer interface; unsafe or inaccurate autonomous clinical decisions are irreversible and create direct patient harm liability.",
+    bench:"TLSCAS ≥ 0.95; evaluated over validated clinical scenario sets with clinician consensus labels" },
+
+  { name:"Task Success Rate — WebArena", abbr:"WebArena-TSR", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Percentage of autonomous tasks successfully completed in a realistic web environment spanning e-commerce, forums, and collaborative content management. Primary liability signal for UI-driven autonomous action — did the agent complete what was authorized?",
+    bench:"Target ≥ 50% end-to-end task success across diverse web environments" },
+
+  // risk: liab — voice abandonment signals task failure before any action is taken; leading indicator of liability events
+  { name:"Call Abandonment Rate (CAR)", abbr:"CAR", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Proportion of inbound patient calls where the caller disconnects before completing the intended interaction. In voice agent scheduling, abandonment is a leading indicator of the agent failing to accomplish its authorized task — a liability precursor.",
+    bench:"Acceptable <5%; rates >8% associated with patient dissatisfaction and workflow failure" },
+
+  // risk: priv — platform downtime creates gaps in audit trails, blocking privacy investigations
+  { name:"Platform Reliability Score (PRS)", abbr:"PRS", col:"comp", cat:"safety", risk:"priv",
+    desc:"Composite of uptime %, MTBF, and unplanned incident rate for the voice agent platform. Infrastructure downtime creates gaps in audit trails for patient interactions, blocking any investigation of data access events.",
+    bench:"Uptime ≥ 99.9%; analysis of 80,381 patient safety event reports found 76 IT downtime-related events" },
+
+  { name:"Patient-Reported Experience Score", abbr:"PRES", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Post-call IVR/SMS survey using CG-CAHPS methodology. Captures patient-perceived accountability for voice-agent-driven scheduling actions. Low scores signal the agent's autonomous actions did not match patient expectations or intent.",
+    bench:"CG-CAHPS top-box composite scores >70% in ambulatory care settings" },
+
+  // risk: liab — missed PPE violation = patient/worker harm; false alarm = alert fatigue eroding safety oversight
+  { name:"PPE Non-Compliance Alert F1 (PNA-F1)", abbr:"PNA-F1", col:"comp", cat:"safety", risk:"liab",
+    desc:"Precision-recall F1 for agentic vision systems monitoring live video for PPE violations. Both false negatives (missed violations → patient harm) and false positives (alert fatigue → oversight degradation) create direct liability for the deploying organization.",
+    bench:"YOLO-based hybrid dataset models: mAP@50 of 83.1%; target PNA-F1 ≥ 0.90" },
+
+  { name:"Triage Appropriateness Rate", abbr:"TAR", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Proportion of AI-assisted triage decisions that correctly prioritize patient urgency compared to final clinical assessment. Delivered through a clinical computer interface; wrong triage routing is irreversible if it delays time-sensitive care.",
+    bench:"AI-assisted triage: 89.3% vs. 74.7% with traditional triage" },
+
+  // risk: liab — in time-critical clinical contexts, latency that exceeds safe response windows is a liability event
+  { name:"End-to-End Clinical Agent Response Latency", abbr:"E2E-Latency", col:"comp", cat:"efficiency", risk:"liab",
+    desc:"Elapsed time between clinician case submission and receipt of the agent's recommendation in a real-world WhatsApp-based agentic deployment. In acute clinical contexts, response latency that exceeds safe windows is a direct liability risk.",
+    bench:"Observed 5–7 seconds under live WhatsApp deployment" },
+
+  // USS: broadly applicable but the CSV source is a voice/dialog interaction metric
+  { name:"User Satisfaction Score (USS)", abbr:"USS", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Standardized post-interaction user rating on usefulness, clarity, and responsiveness. Sourced from dialog/voice agent evaluations; low satisfaction scores indicate the agent's autonomous actions did not match user intent — a liability accountability signal.",
+    bench:"Target USS ≥ 0.80 or CSAT ≥ 80%" },
+
+  // HIR: CSV source is agent-executed steps requiring human correction in interactive settings
+  { name:"Human Intervention Rate (HIR)", abbr:"HIR", col:"comp", cat:"efficacy", risk:"liab",
+    desc:"Proportion of agent-executed steps requiring human correction, override, or manual intervention. In computer-use workflows, every human override is evidence the agent took an action that required reversal — direct accountability signal.",
+    bench:"Compared against human-only workflows and baseline agents" },
+
+
+  /* ── CODE GEN & EXECUTION ─────────────────────────────────────────
+     Metrics whose CSV source explicitly involves writing or executing novel code.
+  ─────────────────────────────────────────────────────────────────── */
+
+  { name:"Regression Non-Introduction Rate (RNIR)", abbr:"RNIR", col:"code", cat:"safety", risk:"liab",
+    desc:"Proportion of agent-generated code patches that fix the target issue without breaking any previously passing tests. Autonomous code that silently breaks production systems is the primary irreversibility liability in code-generation agents.",
+    bench:"SWE-bench Verified: top models achieve ~70%+ FAIL-TO-PASS; PASS-TO-PASS degrades on complex edits" },
+
+  // risk: liab — decontaminated sets expose whether the agent actually reasons or just reproduces; the latter is an accountability risk
+  { name:"Decontaminated Task Success Rate", abbr:"DTSR", col:"code", cat:"safety", risk:"liab",
+    desc:"Task success rate on evaluation datasets explicitly curated to exclude training data overlap. Agents that rely on memorized solutions rather than genuine reasoning produce unpredictable failures in production — an undisclosed liability.",
+    bench:"Large performance degradation on decontaminated datasets demonstrated; no fixed threshold" },
+
+  { name:"Pass@1 Task Completion Rate", abbr:"Pass@1", col:"code", cat:"safety", risk:"liab",
+    desc:"Proportion of real-world software tasks completed successfully on the first attempt without retries. No retries reflects production reality — in code-execution agents, each failed attempt that retries expands the blast radius.",
+    bench:"Pass@1 ≥ 0.40 based on APEX-SWE leaderboard for complex tasks" },
+
+  // risk: liab — acting on unverified assumptions in code context means executing code that may access/modify wrong data
+  { name:"Epistemic Verification Behavior Rate", abbr:"EVBR", col:"code", cat:"safety", risk:"liab",
+    desc:"Proportion of decision steps where the agent explicitly distinguishes verified facts from assumptions before acting. In code-generation agents, executing code built on unverified assumptions produces outputs with unpredictable scope — a liability gap.",
+    bench:"No standardized threshold; APEX-SWE qualitatively shows top agents consistently apply verification" },
+
+  { name:"Proportion of Errors Auto-Corrected", abbr:"PEAC", col:"code", cat:"usability", risk:"liab",
+    desc:"Fraction of detected errors for which the AI system also provides a correct automated fix without human intervention. Quantifies self-correction capability in autonomous code agents — high PEAC reduces the liability window between error introduction and resolution.",
+    bench:"~75.8% of flagged errors correctly auto-corrected by the AI Checker system" },
+
+
+  /* ── DATA INTERACTION ─────────────────────────────────────────────
+     CHAI skill category: how agents access & interpret healthcare data.
+     No T&E metrics exist yet — all cells are gaps.
+  ─────────────────────────────────────────────────────────────────── */
+
+  /* ── CONTEXT & HAND-OFF ───────────────────────────────────────────
+     CHAI skill category: structuring information for humans-in-the-loop and other agents.
+     No T&E metrics exist yet — all cells are gaps.
+  ─────────────────────────────────────────────────────────────────── */
+
+  /* ── TASK EXECUTION ───────────────────────────────────────────────
+     CHAI skill category: performing real clinical workflows and deliverables.
+     Some T&E metrics apply here — see below.
+  ─────────────────────────────────────────────────────────────────── */
+
+  // Triage and TLSCAS already placed in comp. Below are task-execution specific:
+
+  // Summarization: output of a clinical workflow step handed to a clinician for review
+  { name:"Summarization Editing Effort Reduction", abbr:"SEER", col:"task", cat:"efficiency", risk:"liab",
+    desc:"Percentage reduction in edits required by clinicians to improve AI-generated clinical summaries vs. physician drafts. Proxy for liability: summaries requiring heavy editing indicate the agent's autonomous clinical output is not trustworthy without substantial human review.",
+    bench:"LLM-generated drafts: 31.5% mean editing vs. 44.8% for physician drafts" },
+
+  // Claim Recall: factual completeness of a clinical workflow deliverable
+  { name:"Claim Recall for Summary Factual Coverage", abbr:"CR-SFC", col:"task", cat:"usability", risk:"liab",
+    desc:"Proportion of atomic reference claims supported by the generated clinical summary. Missing facts in agent-generated clinical summaries are a task execution liability: a clinician acting on an incomplete summary may make an uninformed decision.",
+    bench:"Baseline LLMs: 20–30% claim recall on long-form summarization benchmarks" },
+
+  // Intermediate Step Correctness: reasoning steps in a multi-step clinical or legal task workflow
+  { name:"Intermediate Step Correctness Rate", abbr:"ISCR", col:"task", cat:"safety", risk:"liab",
+    desc:"Proportion of intermediate reasoning steps in a multi-step agentic workflow that are logically correct and aligned with the task objective. In clinical and legal task execution, incorrect intermediate steps create liability even if the final answer appears correct.",
+    bench:"Study reports intermediate progress tracking without a fixed threshold; highlights need for step-level evaluation" },
+
+  // RPM Devices: task execution of a continuous health monitoring workflow
+  { name:"Number of Integrated Wearable / RPM Device Types", abbr:"RPM-Devices", col:"task", cat:"usability", risk:"third",
+    desc:"Count of distinct wearable or remote patient monitoring device classes successfully integrated into an autonomous health monitoring task execution pipeline. Measures interoperability breadth — each additional device type introduces a new third-party data dependency.",
+    bench:"Prototype: ≥ 2 distinct device sources (smartwatch + video/camera)" },
+
+  // Per-Record Processing Time: throughput of a clinical record-processing task execution
+  { name:"Per-Record Processing Time", abbr:"PRPT", col:"task", cat:"efficiency", risk:"liab",
+    desc:"Average time to process a single clinical input record in an automated risk stratification pipeline. Throughput failures in time-sensitive task execution pipelines create liability: delayed risk stratification can mean delayed intervention.",
+    bench:"Mean 0.18 ms; CV <5% on standard hardware" },
+
+  // Provider Preference Match: outcome of a scheduling task execution
+  { name:"Provider Preference Match Rate", abbr:"PPMR", col:"task", cat:"efficacy", risk:"liab",
+    desc:"Proportion of scheduled appointments where the assigned provider aligns with the patient's stated or historically inferred preference. Preference mismatch in autonomous scheduling task execution reduces care continuity and is a patient experience liability.",
+    bench:"No standardized threshold; preference-aware scheduling policies outperform baseline in studies" },
+
+
+  /* ── UNIVERSAL ────────────────────────────────────────────────────
+     Only metrics whose CHAI T&E description is genuinely mechanism-agnostic
+     and applies across all 6 action types (tool, comp, code, data, ctx, task).
+     Multi-agent-specific and domain-specific metrics are NOT placed here.
+  ─────────────────────────────────────────────────────────────────── */
+
+  { name:"Goal Completion Rate (GCR)", abbr:"GCR", col:"all", cat:"efficacy", risk:"liab",
+    desc:"Proportion of multi-step tasks where the agent achieves the intended goal without human override. Applies identically whether the agent is calling tools, navigating a UI, generating code, accessing data, packaging context, or executing a clinical workflow.",
+    bench:"GCR ≥ 0.85 across a representative task suite; N ≥ 100 diverse scenarios" },
+
+  { name:"Autonomy Index (AIx)", abbr:"AIx", col:"all", cat:"efficacy", risk:"liab",
+    desc:"Fraction of task steps completed independently and correctly without human intervention or fallback. The higher the autonomy, the lower the human oversight, and the higher the liability threshold — true regardless of the action mechanism used.",
+    bench:"AIx ≥ 0.80 across a representative task benchmark" },
+
+  { name:"Harm-Reduction Index (HRI)", abbr:"HRI", col:"all", cat:"safety", risk:"mal",
+    desc:"Composite of hallucination rate, harmful content generation rate, and domain-specific safety violations. Aggregates malicious-use risk signals across all output types — text, UI actions, code, data outputs, context packages, and task deliverables.",
+    bench:"HRI ≥ 0.90 over standardized evaluation suite" },
+
+  { name:"Safety Score (Agent-SafetyBench)", abbr:"AgentSafety", col:"all", cat:"safety", risk:"mal",
+    desc:"Proportion of tasks completed without triggering any of 10 defined safety failure modes across 349 interactive environments. Explicitly designed to be mechanism-agnostic across diverse agentic systems.",
+    bench:"Safety Score ≥ 0.60 across 2,000 test cases in 349 environments" },
+
+  { name:"Constraint Violation Rate (CVR)", abbr:"CVR", col:"all", cat:"safety", risk:"liab",
+    desc:"Frequency with which an agent violates formal safety or ethical constraints while optimizing for task goals. Applicable to any action type: a tool-calling agent can violate constraints, as can a code-generating, UI-navigating, or task-executing one.",
+    bench:"CVR ≤ 0.10 across 40 benchmark scenarios with clearly defined constraint violations" },
+
+  { name:"Plan Adherence Score (PAS)", abbr:"PAS", col:"all", cat:"safety", risk:"liab",
+    desc:"Proportion of planned steps executed in the correct order. Any agentic system that generates a plan and then executes it — regardless of mechanism — can be measured on whether it followed that plan.",
+    bench:"PAS ≥ 0.85 across representative trajectory datasets" },
+
+  { name:"Goal Adherence Score (GAS)", abbr:"GAS", col:"all", cat:"safety", risk:"liab",
+    desc:"Degree to which the agent's behavior remains aligned with its original objective over a multi-step trajectory. Goal drift is a risk in any long-horizon agent regardless of whether it calls tools, uses a UI, generates code, or executes tasks.",
+    bench:"GAS ≥ 0.90 across long-horizon evaluation scenarios" },
+
+  { name:"Step Correctness Rate (SCR)", abbr:"SCR", col:"all", cat:"safety", risk:"liab",
+    desc:"Proportion of intermediate trajectory steps labeled correct by human evaluators. A trajectory exists for any agentic mechanism — process-level accountability applies universally.",
+    bench:"SCR ≥ 0.80 across representative trajectory datasets with human-annotated step labels" },
+
+  // PEI: risk mapped to liab not third — excess steps create runaway agent behavior, an accountability problem
+  { name:"Planning Efficiency Index (PEI)", abbr:"PEI", col:"all", cat:"efficiency", risk:"liab",
+    desc:"Ratio of optimal steps to actual steps taken. An agent that takes far more steps than necessary is operating outside its authorized scope — excess tool calls, UI interactions, code executions, or data accesses all create accountability gaps.",
+    bench:"PEI ≥ 0.70 across a representative task suite" },
+
+  { name:"Balanced Evaluation Coverage Score (BECS)", abbr:"BECS", col:"all", cat:"efficacy", risk:"liab",
+    desc:"Measures how well an evaluation protocol covers technical, human-centered, safety, and economic dimensions. A protocol with low BECS creates unknown liability exposure by leaving entire risk dimensions unmeasured — applies to any action type's evaluation.",
+    bench:"Target BECS ≥ 0.75; baseline technical-only evaluations often <0.50" },
+
+  { name:"Intraclass Correlation Coefficient (ICC)", abbr:"ICC", col:"all", cat:"safety", risk:"liab",
+    desc:"Consistency of agent performance across repeated runs of the same task. Decomposes variance into between-task difficulty vs. within-task inconsistency. Hidden inconsistency is a liability risk for any autonomous system regardless of mechanism.",
+    bench:"ICC ≥ 0.70 acceptable; ≥ 0.80 high reliability" },
+
+  { name:"Standard Deviation of Task Success Rate (σ-TSR)", abbr:"σ-TSR", col:"all", cat:"safety", risk:"liab",
+    desc:"Variability in task success rate across repeated independent runs of the same evaluation set. High σ means single-run benchmarks are unreliable — a universal evaluation quality problem across all action types.",
+    bench:"σ ≤ 0.015 (≤1.5 percentage points) across ≥ 10 independent runs" },
+
+  // Cost-per-Success: risk liab — runaway agent costs from excess failures are an operational accountability issue
+  { name:"Cost-per-Success (Cost-of-Pass)", abbr:"CpS", col:"all", cat:"efficiency", risk:"liab",
+    desc:"Average operational cost to successfully complete one task. Penalizes over-planning, excessive calls, and retries — failure modes that occur across all action types. An agent that spends 2× the budget to complete a task was not operating within authorized scope.",
+    bench:"≤ $0.228/task; Efficient Agents reduced cost from $0.398 while retaining 96.7% of performance" },
+
+  // Fairness — PPR and FCSR are applicable to any decision output; demographic and RL-specific ones removed
+  { name:"Predictive Parity Ratio (PPR)", abbr:"PPR", col:"all", cat:"fairness", risk:"agent",
+    desc:"Ratio of positive predictive values across protected groups. Any agent that makes positive decisions — scheduling, CDS recommendations, task routing, data access grants — can be evaluated for whether those decisions are equally reliable across demographic subgroups.",
+    bench:"PPR ≥ 0.90 for all group pairs (within ±10%)" },
+
+  { name:"Fairness Constraint Satisfaction Rate (FCSR)", abbr:"FCSR", col:"all", cat:"fairness", risk:"agent",
+    desc:"Proportion of agentic AI decisions that satisfy all embedded fairness constraints. Any decision-making agent — regardless of mechanism — can be audited against defined fairness constraints embedded in its policy.",
+    bench:"FCSR ≥ 0.90 across representative test suite" },
+];
+
+/* ═══════════ GAPS ═══════════
+   Gap cards for cells with no T&E metric mapped.
+   Original 3 action types: gaps where no metric covers that cell.
+   CHAI 3 action types: all cells are gaps (no T&E metrics exist yet).
+*/
+const GAPS = [
+  /* Tool Calling gaps */
+  { cell:"priv-tool", name:"Unauthorized Data Access Rate",
+    desc:"No metric tracks whether a tool-calling agent accessed data beyond what its task required — the core least-privilege gap in tool-use evaluation." },
+  { cell:"priv-tool", name:"Data Minimization Score",
+    desc:"No metric evaluates whether the agent requested only the minimum data scope needed per tool interaction." },
+  { cell:"inj-tool", name:"Prompt Injection Success Rate (Tool)",
+    desc:"NIPD is a noise-injection proxy, not a direct adversarial injection test. No dedicated injection test suite exists for tool-calling agents in the T&E framework." },
+  { cell:"mal-tool", name:"Misuse Capability Score",
+    desc:"No systematic evaluation of whether a tool-calling agent can be redirected to generate harmful API payloads through adversarial prompting." },
+  { cell:"third-tool", name:"Third-Party Source Verification Rate",
+    desc:"No metric validates that data returned by third-party tool calls comes from a trusted, non-spoofed endpoint before the agent acts on it." },
+  { cell:"agent-tool", name:"Error Propagation Rate (Tool Chain)",
+    desc:"No metric tracks how often a tool-calling agent's output, when consumed by a downstream agent, produces a cascading failure." },
+
+  /* Computer Use gaps */
+  { cell:"priv-comp", name:"Screen Data Capture Scope",
+    desc:"No metric measures what sensitive data a computer-use agent observed on screen but did not need to process for its current task." },
+  { cell:"inj-comp", name:"Instruction Hijack Rate (Screen Content)",
+    desc:"No metric measures how often malicious content rendered on screen successfully redirects the computer-use agent's behavior." },
+  { cell:"mal-comp", name:"Abuse Scenario Coverage (Computer Use)",
+    desc:"No structured misuse testing for computer-use agents — e.g. social engineering at scale or automated phishing via UI interaction." },
+  { cell:"third-comp", name:"Source Trustworthiness Score (Web Content)",
+    desc:"No validation metric for whether the web content a computer-use agent reads comes from a trusted, non-spoofed source before acting on it." },
+  { cell:"agent-comp", name:"Handoff Failure Rate (UI Transition)",
+    desc:"No evaluation of how often agent-to-agent transitions via computer-use interfaces produce ambiguity, dropped context, or duplicate actions." },
+
+  /* Code Gen gaps */
+  { cell:"priv-code", name:"Sensitive Data Exposure in Generated Code",
+    desc:"No metric detects when agent-generated code inadvertently embeds, logs, or transmits sensitive data." },
+  { cell:"inj-code", name:"Code Injection via External Data",
+    desc:"No metric captures successful injection of malicious instructions through data sources that are then incorporated into generated and executed code." },
+  { cell:"mal-code", name:"Malicious Code Generation Rate",
+    desc:"No systematic evaluation of whether a code-generation agent can be redirected to write and execute malicious code through adversarial inputs." },
+  { cell:"third-code", name:"Dependency/Package Provenance Accuracy",
+    desc:"No metric tracks whether agent-imported packages or dependencies come from verified, uncompromised repositories." },
+  { cell:"agent-code", name:"Cross-Agent Code Contamination Rate",
+    desc:"No metric for whether code generated by one agent and executed by another introduces unintended behaviors or security vulnerabilities." },
+
+  /* Data Interaction — all gaps (no T&E metrics exist for this CHAI skill category) */
+  { cell:"priv-data",  name:"FHIR Access Scope Compliance Rate",
+    desc:"No T&E metric tracks whether data-interaction agents retrieve only the FHIR resources within their authorized scope for the active task." },
+  { cell:"liab-data",  name:"Data Omission Liability Rate",
+    desc:"No metric captures how often missing or delayed healthcare data causes an agent to take a clinical action that would have differed with complete information." },
+  { cell:"inj-data",   name:"Adversarial Structured Data Feed Robustness",
+    desc:"No metric tests whether adversarially crafted FHIR/HL7 values can alter agent behavior — the healthcare-specific data-layer injection vector." },
+  { cell:"mal-data",   name:"PHI Over-Collection Detection Rate",
+    desc:"No metric detects when a data-interaction agent systematically queries PHI fields beyond its task scope, a precursor to exfiltration." },
+  { cell:"third-data", name:"External Data Source Provenance Verification",
+    desc:"No metric validates that data ingested from third-party feeds (labs, payers, devices) was verified for provenance before the agent acts on it." },
+  { cell:"agent-data", name:"Concurrent EHR Read Consistency Rate",
+    desc:"No metric verifies that multiple agents querying the same patient record simultaneously receive consistent, non-conflicting data." },
+
+  /* Context & Hand-off — all gaps */
+  { cell:"priv-ctx",   name:"Role-Appropriate Disclosure Rate",
+    desc:"No metric measures whether context packages contain only information appropriate for the receiving role — over-disclosure to downstream agents or clinicians is a PHI privacy gap." },
+  { cell:"liab-ctx",   name:"Silent Context Truncation Rate",
+    desc:"No metric detects when an agent silently truncates a context package due to token limits, removing clinically critical information before handoff." },
+  { cell:"inj-ctx",    name:"Cross-Agent Context Field Injection Rate",
+    desc:"No standardized metric for injecting adversarial instructions into structured context fields (e.g. clinical notes) that pass between agents without sanitization." },
+  { cell:"mal-ctx",    name:"Context Manipulation for Downstream Misdirection",
+    desc:"No metric evaluates whether a malicious actor can alter context packages to cause a downstream agent to take a different action than intended." },
+  { cell:"third-ctx",  name:"Third-Party Context Source Verification Rate",
+    desc:"No metric validates that context aggregated from third-party systems was verified for provenance before inclusion in a handoff package." },
+  { cell:"agent-ctx",  name:"Context Fidelity Across Agent Handoffs",
+    desc:"No metric measures the proportion of clinically relevant fields correctly preserved after agent-to-agent context transformation — dropped context is the primary agent-to-agent propagation risk." },
+
+  /* Task Execution — partial gaps (some T&E metrics placed above) */
+  { cell:"priv-task",  name:"Task-Scope PHI Access Rate",
+    desc:"No metric tracks whether task execution agents access only the PHI required for the specific task step currently being executed." },
+  { cell:"inj-task",   name:"Workflow Injection via Structured Clinical Input",
+    desc:"No metric tests whether adversarially crafted structured inputs (order payloads, HL7 ADT messages) can redirect task execution to unintended clinical actions." },
+  { cell:"mal-task",   name:"Task Misdirection Resistance Rate",
+    desc:"No metric evaluates whether task execution agents resist attempts to redirect them to perform unauthorized clinical actions through manipulated inputs." },
+  { cell:"agent-task", name:"Sub-Agent Coordination Failure Attribution Rate",
+    desc:"No metric identifies which sub-agent in a multi-agent clinical task pipeline caused a coordination failure — making post-incident accountability difficult." },
+];
+
+/* ── State ── */
+let currentCat = 'all';
+let showGaps = true;
+
+const COL_LABELS = {
+  tool:'Tool Calling', comp:'Computer Use', code:'Code Gen & Exec',
+  data:'Data Interaction', ctx:'Context & Hand-off', task:'Task Execution', all:'All types'
+};
+
+function render() {
+  document.querySelectorAll('.cell').forEach(c => { c.innerHTML = ''; });
+  document.getElementById('universal-grid').innerHTML = '';
+  let counts = { tool:0, comp:0, code:0, data:0, ctx:0, task:0, all:0, gap:0 };
+
+  METRICS.filter(m => m.col !== 'all').forEach(m => {
+    if (currentCat !== 'all' && m.cat !== currentCat) return;
+    const cell = document.getElementById(`${m.risk}-${m.col}`);
+    if (!cell) return;
+    counts[m.col]++;
+    const card = makeMetricCard(m);
+    card.classList.add('visible');
+    cell.appendChild(card);
+  });
+
+  if (showGaps) {
+    GAPS.forEach(g => {
+      const cell = document.getElementById(g.cell);
+      if (!cell) return;
+      counts.gap++;
+      const card = makeGapCard(g);
+      card.classList.add('visible');
+      cell.appendChild(card);
+    });
+  }
+
+  METRICS.filter(m => m.col === 'all').forEach(m => {
+    if (currentCat !== 'all' && m.cat !== currentCat) return;
+    counts.all++;
+    const card = makeUniversalCard(m);
+    card.classList.add('visible');
+    document.getElementById('universal-grid').appendChild(card);
+  });
+
+  const PILL = { tool:'pill-tool', comp:'pill-comp', code:'pill-code', data:'pill-data', ctx:'pill-ctx', task:'pill-task' };
+  document.getElementById('summary-bar').innerHTML =
+    Object.keys(PILL).map(k =>
+      `<span class="pill ${PILL[k]}">${COL_LABELS[k]}: ${counts[k]} metrics</span>`
+    ).join('') +
+    `<span class="pill pill-all">All types: ${counts.all} metrics</span>` +
+    (showGaps ? `<span class="pill pill-gap">Coverage gaps: ${counts.gap}</span>` : '');
+}
+
+function makeMetricCard(m) {
+  const d = document.createElement('div');
+  d.className = 'metric-card';
+  d.innerHTML = `
+    <div class="card-name">${m.name}</div>
+    <div class="card-tag">${m.cat.charAt(0).toUpperCase()+m.cat.slice(1)}</div>
+    <div class="card-body">
+      <p>${m.desc}</p>
+      <span class="card-bench ${m.col}">${m.bench}</span>
+    </div>`;
+  d.addEventListener('click', () => d.classList.toggle('expanded'));
+  return d;
+}
+
+function makeGapCard(g) {
+  const d = document.createElement('div');
+  d.className = 'gap-card';
+  d.innerHTML = `
+    <div class="card-name"><span class="gap-badge">Gap</span>${g.name}</div>
+    <div class="card-tag">Coverage missing</div>
+    <div class="card-body"><p>${g.desc}</p></div>`;
+  d.addEventListener('click', () => d.classList.toggle('expanded'));
+  return d;
+}
+
+function makeUniversalCard(m) {
+  const d = document.createElement('div');
+  d.className = 'universal-card';
+  d.innerHTML = `
+    <div class="card-name">${m.name}</div>
+    <div class="card-tag">${m.cat.charAt(0).toUpperCase()+m.cat.slice(1)} · ${riskLabel(m.risk)}</div>
+    <div class="card-body">
+      <p>${m.desc}</p>
+      <span class="card-bench all">${m.bench}</span>
+    </div>`;
+  d.addEventListener('click', () => d.classList.toggle('expanded'));
+  return d;
+}
+
+function riskLabel(r) {
+  return { priv:'Data Privacy', liab:'Liability', inj:'Prompt Injection',
+           mal:'Malicious Use', third:'Third-Party', agent:'Agent-to-Agent' }[r] || r;
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.btn[onclick^="filterCat"]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = cat;
+  render();
+}
+
+function toggleGaps(btn) {
+  showGaps = !showGaps;
+  btn.classList.toggle('active', showGaps);
+  btn.textContent = showGaps ? 'Show gaps' : 'Hide gaps';
+  render();
+}
+
+render();
+</script>
+</body>
+</html>
