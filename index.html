@@ -343,6 +343,10 @@ const METRICS = [
   { name:"Escalation Rate (ESR)", abbr:"ESR", col:"tool", cat:"safety", risk:"liab",
     desc:"Proportion of agent interactions transferred to a live human agent. In tool-calling contexts this is the primary human-oversight signal: the agent recognizes it cannot safely proceed and escalates before taking an irreversible action.",
     bench:"Escalation-based fallback pipelines reduced agent failure rates ~50% on tau-bench" },
+  
+  { name:"Cost per Successful Task (CLEAR Framework)", abbr:"CPT", col:"tool", cat:"efficacy", risk:"liab",
+  desc:"Total computational or monetary cost incurred per successfully completed task: (total cost across all executions including model inference and tool usage) / (successful tasks). Captures cost-performance tradeoff in agentic systems; comparable task success can hide significant cost divergence.",
+  bench:"No universal threshold; minimize while maintaining acceptable task success rate — CLEAR framework comparative evaluation; arxiv 2511.14136" },
 
   // risk: inj — noise injection into tool responses is the primary proxy for injection robustness in tool-calling
   { name:"Noise-Induced Performance Degradation (NIPD)", abbr:"NIPD", col:"tool", cat:"safety", risk:"inj",
@@ -396,11 +400,19 @@ const METRICS = [
     desc:"Proportion of intermediate reasoning and tool-invocation steps correctly completed before reaching a final answer on multi-hop legal tasks. Distinguishes partial completion from total failure — critical in regulated legal environments.",
     bench:"LegalAgentBench: GPT-4o (ReAct) ~28% success rate, ~55% intermediate progress rate" },
 
+  { name:"Milestone Achievement Rate", abbr:"MAR", col:"comp", cat:"efficacy", risk:"liab",
+  desc:"Proportion of predefined intermediate subgoals successfully completed by a multi-agent system during task execution: (achieved milestones / total defined milestones) × 100. Evaluates how effectively agents coordinate to progress toward a final objective through structured intermediate checkpoints.",
+  bench:"No universal threshold; used as comparative KPI across coordination strategies and agent architectures; arxiv 2503.01935" },
+
   // risk: third — TSA is the first gate before any external API is called; wrong tool = wrong system
   { name:"Tool Selection Accuracy (TSA)", abbr:"TSA", col:"tool", cat:"safety", risk:"third",
     desc:"Proportion of decisions where the agent selects the correct tool from a candidate set that includes distractors. The first-order control for third-party risk: selecting the wrong tool misdirects a real API call to an unintended external system.",
     bench:"TSA ≥ 0.80 across representative tool-use benchmarks" },
-
+    
+  { name:"Cumulative Risk Exposure", abbr:"CRE", col:"comp", cat:"safety", risk:"agent",
+  desc:"Total safety risk accumulated by a multi-agent system over time — continuously estimated per-agent action risk summed across all agents and time steps. Captures how individual decisions compound into system-level safety exposure, accounting for uncertainty and inter-agent interaction effects.",
+  bench:"No universal threshold; risk-aware coordination mechanisms shown to significantly reduce CRE vs. baseline — lower is safer; arxiv 2502.04249" },
+  
 
   /* ── COMPUTER USE ──────────────────────────────────────────────────
      Metrics whose CSV source involves UI navigation, voice, screen interaction,
@@ -603,8 +615,17 @@ const METRICS = [
   { name:"Fairness Constraint Satisfaction Rate (FCSR)", abbr:"FCSR", col:"all", cat:"fairness", risk:"agent",
     desc:"Proportion of agentic AI decisions that satisfy all embedded fairness constraints. Any decision-making agent — regardless of mechanism — can be audited against defined fairness constraints embedded in its policy.",
     bench:"FCSR ≥ 0.90 across representative test suite" },
-];
 
+  { name:"Multi-Agent Demographic Parity Fairness Score", abbr:"MADPFS", col:"all", cat:"fairness", risk:"liab",
+    desc:"Quantifies fairness across groups influenced by agentic decisions by measuring whether protected attributes have no systematic advantage in expected rewards, outcomes, or service levels. Adapted from classic demographic parity definitions into a multi-agent interaction context.",
+    bench:"Δ(Expected Outcome Group A − Group B) within ±5% tolerance across protected groups; arxiv 2410.12889" },
+
+  // col candidates: "all" or "comp" — policy-level, trajectory-based
+  { name:"Counterfactual Unfairness Level", abbr:"CUL", col:"all", cat:"fairness", risk:"liab",
+    desc:"Measures policy-level unfairness in sequential decision-making as the degree to which action allocation would change under a counterfactual protected-attribute swap, holding causal non-sensitive drivers constant. Evaluated over full trajectories, not individual predictions.",
+    bench:"CUL ≤ 0.05 (PyCFRL baseline: 0.407 Full / 0.446 Unaware → fair policy achieved 0.042); arxiv 2510.06935" },
+
+];
 /* ═══════════ GAPS ═══════════
    Gap cards for cells with no T&E metric mapped.
    Original 3 action types: gaps where no metric covers that cell.
