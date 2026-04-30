@@ -140,6 +140,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .card-tag  { font-size: 10px; color: var(--text-faint); }
 .card-body { display: none; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--border); }
 .card-body p { font-size: 11px; color: var(--text-muted); line-height: 1.5; margin-bottom: 5px; }
+.card-section { margin-bottom: 6px; }
+.card-section-label { display: block; font-size: 9px; font-weight: 700; letter-spacing: .55px; text-transform: uppercase; color: var(--text-faint); margin-bottom: 2px; }
+.card-section p { margin-bottom: 0; }
+.card-rationale { color: var(--text-muted); }
+.card-mapping { font-size: 10px; color: var(--text-faint); margin-bottom: 6px; }
 .card-bench { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; display: inline-block; }
 .card-bench.tool  { background: var(--tool-bg); color: var(--tool-text); }
 .card-bench.comp  { background: var(--comp-bg); color: var(--comp-text); }
@@ -179,7 +184,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
     <span class="chai-badge">CHAI</span>
     <h1>Agentic AI — Unified T&amp;E Framework</h1>
   </div>
-  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>6 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories — T&amp;E coverage gaps for these are marked explicitly. Click any card to expand details. Gap cards identify where evaluation coverage is missing.</p>
+  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>6 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories — T&amp;E coverage gaps for these are marked explicitly. Click any card to expand definition, action-type rationale, risk-domain rationale, and benchmark details. Gap cards identify where evaluation coverage is missing.</p>
 </div>
 
 <div class="controls">
@@ -332,14 +337,17 @@ const METRICS = [
     desc:"Proportion of tool-augmented runs where the tool call executes without error and returns a valid, parseable output. Execution failure breaks the task chain — downstream steps act on no data or stale state, creating accountability gaps.",
     bench:"TESR ≥ 0.90 across tool-augmented tasks" },
 
+  // risk: liab — end-goal failure after tool interactions means the authorized action was never completed
   { name:"Task Completion Rate with Tool Use (TCR-T)", abbr:"TCR-T", col:"tool", cat:"efficacy", risk:"liab",
     desc:"Whether the agent achieves the correct end goal after tool interactions — evaluated on final environment state, not intermediate steps. Primary liability signal: did the tool-driven action actually accomplish what was authorized?",
     bench:"TCR-T ≥ 0.75 on multi-step tool-use benchmarks" },
 
+  // risk: liab — policy-violating tool actions (unauthorized refunds, bypassed checks) are the direct liability exposure in regulated tool workflows
   { name:"Business Policy Adherence Rate (BPAR)", abbr:"BPAR", col:"tool", cat:"safety", risk:"liab",
     desc:"Proportion of multi-turn agentic interactions completed without any policy-violating tool action (e.g. unauthorized refunds, bypassed verification). Directly measures liability exposure from autonomous tool use in regulated workflows.",
     bench:"Multi-domain enterprise benchmark; GPT-4o <50% on retail domain" },
 
+  // risk: liab — agent recognizes unsafe tool-call path and hands off before taking an irreversible action
   { name:"Escalation Rate (ESR)", abbr:"ESR", col:"tool", cat:"safety", risk:"liab",
     desc:"Proportion of agent interactions transferred to a live human agent. In tool-calling contexts this is the primary human-oversight signal: the agent recognizes it cannot safely proceed and escalates before taking an irreversible action.",
     bench:"Escalation-based fallback pipelines reduced agent failure rates ~50% on tau-bench" },
@@ -358,6 +366,7 @@ const METRICS = [
     desc:"Proportion of turns where agent output violates a predefined output boundary policy — e.g. surfacing internal reasoning, disclosing slot values (DOB, insurance ID) outside the confirmed flow. Direct data privacy metric for voice/dialog agents.",
     bench:"Target 0% critical violations" },
 
+  // risk: liab — unconstrained turn loops produce tool calls outside any auditable or authorized scope
   { name:"Hard Turn Limit Compliance Rate (HTLCR)", abbr:"HTLCR", col:"tool", cat:"safety", risk:"liab",
     desc:"Proportion of calls where the agent triggers a handoff before the defined maximum turn count. Prevents runaway context-overflow loops where the agent keeps attempting tool calls beyond any auditable scope.",
     bench:"Target 100% compliance; no validated production benchmark in peer-reviewed literature" },
@@ -387,6 +396,7 @@ const METRICS = [
     desc:"Proportion of tasks where the agent correctly identifies missing information, retrieves it from external sources, and produces the correct decision. Tests whether agents verify third-party data rather than acting on assumptions.",
     bench:"Best-performing models ~46–48% accuracy on finance agent benchmarks" },
 
+  // risk: liab — without node-level regression coverage, model or prompt updates can silently re-introduce resolved failures with no auditability
   { name:"Node-Level Regression Test Coverage Rate", abbr:"NLTCR", col:"tool", cat:"safety", risk:"liab",
     desc:"Each discrete decision node in the scheduling workflow is assigned a locked regression test suite. Coverage = nodes with active versioned test suites / total nodes. 100% required before any model or prompt update goes to production.",
     bench:"100% node coverage required before production promotion; no peer-reviewed threshold" },
@@ -395,7 +405,8 @@ const METRICS = [
   { name:"Top-k Symptom-to-Visit Type Mapping Accuracy", abbr:"TopK-SVT", col:"tool", cat:"efficacy", risk:"third",
     desc:"Whether the correct visit type derived from patient natural language appears within the top-k predicted outputs. Tests NLP-to-structured-data translation quality for scheduling tool calls that feed external third-party booking systems.",
     bench:"83% precision for classification of patient-generated health text" },
-
+  
+    // risk: liab — intermediate step failures on multi-hop legal tool chains create accountability gaps even when final answers appear correct
   { name:"Legal Agent Intermediate Progress Rate (LAIPR)", abbr:"LAIPR", col:"tool", cat:"efficacy", risk:"liab",
     desc:"Proportion of intermediate reasoning and tool-invocation steps correctly completed before reaching a final answer on multi-hop legal tasks. Distinguishes partial completion from total failure — critical in regulated legal environments.",
     bench:"LegalAgentBench: GPT-4o (ReAct) ~28% success rate, ~55% intermediate progress rate" },
@@ -408,7 +419,7 @@ const METRICS = [
   { name:"Tool Selection Accuracy (TSA)", abbr:"TSA", col:"tool", cat:"safety", risk:"third",
     desc:"Proportion of decisions where the agent selects the correct tool from a candidate set that includes distractors. The first-order control for third-party risk: selecting the wrong tool misdirects a real API call to an unintended external system.",
     bench:"TSA ≥ 0.80 across representative tool-use benchmarks" },
-    
+
   { name:"Cumulative Risk Exposure", abbr:"CRE", col:"comp", cat:"safety", risk:"agent",
   desc:"Total safety risk accumulated by a multi-agent system over time — continuously estimated per-agent action risk summed across all agents and time steps. Captures how individual decisions compound into system-level safety exposure, accounting for uncertainty and inter-agent interaction effects.",
   bench:"No universal threshold; risk-aware coordination mechanisms shown to significantly reduce CRE vs. baseline — lower is safer; arxiv 2502.04249" },
@@ -429,6 +440,7 @@ const METRICS = [
     desc:"Percentage of agentic CDS actions that are both clinically safe and clinically accurate. CDS is delivered through a computer interface; unsafe or inaccurate autonomous clinical decisions are irreversible and create direct patient harm liability.",
     bench:"TLSCAS ≥ 0.95; evaluated over validated clinical scenario sets with clinician consensus labels" },
 
+  // risk: liab — WebArena tasks span e-commerce and forum actions; unauthorized UI-driven completion is the accountability signal
   { name:"Task Success Rate — WebArena", abbr:"WebArena-TSR", col:"comp", cat:"efficacy", risk:"liab",
     desc:"Percentage of autonomous tasks successfully completed in a realistic web environment spanning e-commerce, forums, and collaborative content management. Primary liability signal for UI-driven autonomous action — did the agent complete what was authorized?",
     bench:"Target ≥ 50% end-to-end task success across diverse web environments" },
@@ -443,6 +455,7 @@ const METRICS = [
     desc:"Composite of uptime %, MTBF, and unplanned incident rate for the voice agent platform. Infrastructure downtime creates gaps in audit trails for patient interactions, blocking any investigation of data access events.",
     bench:"Uptime ≥ 99.9%; analysis of 80,381 patient safety event reports found 76 IT downtime-related events" },
 
+  // risk: liab — post-call survey captures whether the agent's autonomous scheduling actions matched patient intent; mismatch = unresolved accountability gap
   { name:"Patient-Reported Experience Score", abbr:"PRES", col:"comp", cat:"efficacy", risk:"liab",
     desc:"Post-call IVR/SMS survey using CG-CAHPS methodology. Captures patient-perceived accountability for voice-agent-driven scheduling actions. Low scores signal the agent's autonomous actions did not match patient expectations or intent.",
     bench:"CG-CAHPS top-box composite scores >70% in ambulatory care settings" },
@@ -451,7 +464,8 @@ const METRICS = [
   { name:"PPE Non-Compliance Alert F1 (PNA-F1)", abbr:"PNA-F1", col:"comp", cat:"safety", risk:"liab",
     desc:"Precision-recall F1 for agentic vision systems monitoring live video for PPE violations. Both false negatives (missed violations → patient harm) and false positives (alert fatigue → oversight degradation) create direct liability for the deploying organization.",
     bench:"YOLO-based hybrid dataset models: mAP@50 of 83.1%; target PNA-F1 ≥ 0.90" },
-
+ 
+  // risk: liab — wrong triage routing via clinical UI is irreversible if it delays time-sensitive care
   { name:"Triage Appropriateness Rate", abbr:"TAR", col:"comp", cat:"efficacy", risk:"liab",
     desc:"Proportion of AI-assisted triage decisions that correctly prioritize patient urgency compared to final clinical assessment. Delivered through a clinical computer interface; wrong triage routing is irreversible if it delays time-sensitive care.",
     bench:"AI-assisted triage: 89.3% vs. 74.7% with traditional triage" },
@@ -476,6 +490,7 @@ const METRICS = [
      Metrics whose CSV source explicitly involves writing or executing novel code.
   ─────────────────────────────────────────────────────────────────── */
 
+  // risk: liab — agent-generated patches that silently break passing tests produce irreversible production failures with no accountability trail
   { name:"Regression Non-Introduction Rate (RNIR)", abbr:"RNIR", col:"code", cat:"safety", risk:"liab",
     desc:"Proportion of agent-generated code patches that fix the target issue without breaking any previously passing tests. Autonomous code that silently breaks production systems is the primary irreversibility liability in code-generation agents.",
     bench:"SWE-bench Verified: top models achieve ~70%+ FAIL-TO-PASS; PASS-TO-PASS degrades on complex edits" },
@@ -485,6 +500,7 @@ const METRICS = [
     desc:"Task success rate on evaluation datasets explicitly curated to exclude training data overlap. Agents that rely on memorized solutions rather than genuine reasoning produce unpredictable failures in production — an undisclosed liability.",
     bench:"Large performance degradation on decontaminated datasets demonstrated; no fixed threshold" },
 
+  // risk: liab — single-run pass@1 reflects production reality; retries expand the blast radius of a failed code execution
   { name:"Pass@1 Task Completion Rate", abbr:"Pass@1", col:"code", cat:"safety", risk:"liab",
     desc:"Proportion of real-world software tasks completed successfully on the first attempt without retries. No retries reflects production reality — in code-execution agents, each failed attempt that retries expands the blast radius.",
     bench:"Pass@1 ≥ 0.40 based on APEX-SWE leaderboard for complex tasks" },
@@ -494,6 +510,7 @@ const METRICS = [
     desc:"Proportion of decision steps where the agent explicitly distinguishes verified facts from assumptions before acting. In code-generation agents, executing code built on unverified assumptions produces outputs with unpredictable scope — a liability gap.",
     bench:"No standardized threshold; APEX-SWE qualitatively shows top agents consistently apply verification" },
 
+  // risk: liab — each auto-corrected error narrows the liability window between code error introduction and resolution without requiring human review
   { name:"Proportion of Errors Auto-Corrected", abbr:"PEAC", col:"code", cat:"usability", risk:"liab",
     desc:"Fraction of detected errors for which the AI system also provides a correct automated fix without human intervention. Quantifies self-correction capability in autonomous code agents — high PEAC reduces the liability window between error introduction and resolution.",
     bench:"~75.8% of flagged errors correctly auto-corrected by the AI Checker system" },
@@ -552,35 +569,42 @@ const METRICS = [
      and applies across all 6 action types (tool, comp, code, data, ctx, task).
      Multi-agent-specific and domain-specific metrics are NOT placed here.
   ─────────────────────────────────────────────────────────────────── */
-
+  // risk: liab — goal failure without human override is the baseline accountability signal across every action type
   { name:"Goal Completion Rate (GCR)", abbr:"GCR", col:"all", cat:"efficacy", risk:"liab",
     desc:"Proportion of multi-step tasks where the agent achieves the intended goal without human override. Applies identically whether the agent is calling tools, navigating a UI, generating code, accessing data, packaging context, or executing a clinical workflow.",
     bench:"GCR ≥ 0.85 across a representative task suite; N ≥ 100 diverse scenarios" },
-
+  
+  // risk: liab — higher autonomy reduces human oversight coverage; the liability threshold scales directly with autonomy level regardless of mechanism
   { name:"Autonomy Index (AIx)", abbr:"AIx", col:"all", cat:"efficacy", risk:"liab",
     desc:"Fraction of task steps completed independently and correctly without human intervention or fallback. The higher the autonomy, the lower the human oversight, and the higher the liability threshold — true regardless of the action mechanism used.",
     bench:"AIx ≥ 0.80 across a representative task benchmark" },
 
+  // risk: mal — aggregates hallucination, harmful content, and safety violations across all output types; malicious-use signal is mechanism-agnostic
   { name:"Harm-Reduction Index (HRI)", abbr:"HRI", col:"all", cat:"safety", risk:"mal",
     desc:"Composite of hallucination rate, harmful content generation rate, and domain-specific safety violations. Aggregates malicious-use risk signals across all output types — text, UI actions, code, data outputs, context packages, and task deliverables.",
     bench:"HRI ≥ 0.90 over standardized evaluation suite" },
 
+  // risk: mal — 10 safety failure modes tested across 349 environments; explicitly designed to be mechanism-agnostic across diverse agentic systems
   { name:"Safety Score (Agent-SafetyBench)", abbr:"AgentSafety", col:"all", cat:"safety", risk:"mal",
     desc:"Proportion of tasks completed without triggering any of 10 defined safety failure modes across 349 interactive environments. Explicitly designed to be mechanism-agnostic across diverse agentic systems.",
     bench:"Safety Score ≥ 0.60 across 2,000 test cases in 349 environments" },
 
+  // risk: liab — formal constraint violations during goal optimization apply to any action type: tool calls, UI actions, code, or task execution
   { name:"Constraint Violation Rate (CVR)", abbr:"CVR", col:"all", cat:"safety", risk:"liab",
     desc:"Frequency with which an agent violates formal safety or ethical constraints while optimizing for task goals. Applicable to any action type: a tool-calling agent can violate constraints, as can a code-generating, UI-navigating, or task-executing one.",
     bench:"CVR ≤ 0.10 across 40 benchmark scenarios with clearly defined constraint violations" },
 
+  // risk: liab — out-of-order or skipped steps create accountability gaps in any trajectory regardless of whether it's a tool chain, UI flow, or code execution
   { name:"Plan Adherence Score (PAS)", abbr:"PAS", col:"all", cat:"safety", risk:"liab",
     desc:"Proportion of planned steps executed in the correct order. Any agentic system that generates a plan and then executes it — regardless of mechanism — can be measured on whether it followed that plan.",
     bench:"PAS ≥ 0.85 across representative trajectory datasets" },
 
+  // risk: liab — goal drift over long horizons expands agent scope beyond what was authorized; applies universally across action mechanisms
   { name:"Goal Adherence Score (GAS)", abbr:"GAS", col:"all", cat:"safety", risk:"liab",
     desc:"Degree to which the agent's behavior remains aligned with its original objective over a multi-step trajectory. Goal drift is a risk in any long-horizon agent regardless of whether it calls tools, uses a UI, generates code, or executes tasks.",
     bench:"GAS ≥ 0.90 across long-horizon evaluation scenarios" },
 
+  // risk: liab — step-level human-annotated correctness is the process accountability signal; a trajectory exists for every agentic mechanism
   { name:"Step Correctness Rate (SCR)", abbr:"SCR", col:"all", cat:"safety", risk:"liab",
     desc:"Proportion of intermediate trajectory steps labeled correct by human evaluators. A trajectory exists for any agentic mechanism — process-level accountability applies universally.",
     bench:"SCR ≥ 0.80 across representative trajectory datasets with human-annotated step labels" },
@@ -590,14 +614,17 @@ const METRICS = [
     desc:"Ratio of optimal steps to actual steps taken. An agent that takes far more steps than necessary is operating outside its authorized scope — excess tool calls, UI interactions, code executions, or data accesses all create accountability gaps.",
     bench:"PEI ≥ 0.70 across a representative task suite" },
 
+  // risk: liab — low coverage leaves entire risk dimensions unmeasured, creating unknown liability exposure regardless of which action type is being evaluated
   { name:"Balanced Evaluation Coverage Score (BECS)", abbr:"BECS", col:"all", cat:"efficacy", risk:"liab",
     desc:"Measures how well an evaluation protocol covers technical, human-centered, safety, and economic dimensions. A protocol with low BECS creates unknown liability exposure by leaving entire risk dimensions unmeasured — applies to any action type's evaluation.",
     bench:"Target BECS ≥ 0.75; baseline technical-only evaluations often <0.50" },
 
+  // risk: liab — hidden within-task inconsistency means single-run benchmarks misrepresent reliability; applies to any agent regardless of mechanism
   { name:"Intraclass Correlation Coefficient (ICC)", abbr:"ICC", col:"all", cat:"safety", risk:"liab",
     desc:"Consistency of agent performance across repeated runs of the same task. Decomposes variance into between-task difficulty vs. within-task inconsistency. Hidden inconsistency is a liability risk for any autonomous system regardless of mechanism.",
     bench:"ICC ≥ 0.70 acceptable; ≥ 0.80 high reliability" },
 
+  // risk: liab — high σ means reported success rates are stochastically unreliable; a universal evaluation validity problem across all action types
   { name:"Standard Deviation of Task Success Rate (σ-TSR)", abbr:"σ-TSR", col:"all", cat:"safety", risk:"liab",
     desc:"Variability in task success rate across repeated independent runs of the same evaluation set. High σ means single-run benchmarks are unreliable — a universal evaluation quality problem across all action types.",
     bench:"σ ≤ 0.015 (≤1.5 percentage points) across ≥ 10 independent runs" },
@@ -612,6 +639,7 @@ const METRICS = [
     desc:"Ratio of positive predictive values across protected groups. Any agent that makes positive decisions — scheduling, CDS recommendations, task routing, data access grants — can be evaluated for whether those decisions are equally reliable across demographic subgroups.",
     bench:"PPR ≥ 0.90 for all group pairs (within ±10%)" },
 
+  // risk: agent — any decision-making agent can be audited against embedded fairness constraints regardless of whether it calls tools, navigates UI, or executes tasks
   { name:"Fairness Constraint Satisfaction Rate (FCSR)", abbr:"FCSR", col:"all", cat:"fairness", risk:"agent",
     desc:"Proportion of agentic AI decisions that satisfy all embedded fairness constraints. Any decision-making agent — regardless of mechanism — can be audited against defined fairness constraints embedded in its policy.",
     bench:"FCSR ≥ 0.90 across representative test suite" },
@@ -761,14 +789,81 @@ function render() {
     (showGaps ? `<span class="pill pill-gap">Coverage gaps: ${counts.gap}</span>` : '');
 }
 
+
+function splitMetricText(m) {
+  const raw = (m.desc || '').trim();
+  if (m.definition && m.rationale) {
+    return { definition: m.definition, rationale: m.rationale };
+  }
+
+  // Protect common abbreviations so definitions do not split into fragments like "e." / "g.".
+  const protectedText = raw
+    .replace(/e\.g\./gi, 'eg__ABBR__')
+    .replace(/i\.e\./gi, 'ie__ABBR__')
+    .replace(/vs\./gi, 'vs__ABBR__')
+    .replace(/etc\./gi, 'etc__ABBR__')
+    .replace(/No\./gi, 'No__ABBR__');
+
+  const sentences = protectedText.match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g) || [protectedText];
+  const restore = s => s
+    .replace(/eg__ABBR__/g, 'e.g.')
+    .replace(/EG__ABBR__/g, 'E.g.')
+    .replace(/ie__ABBR__/g, 'i.e.')
+    .replace(/IE__ABBR__/g, 'I.e.')
+    .replace(/vs__ABBR__/g, 'vs.')
+    .replace(/VS__ABBR__/g, 'Vs.')
+    .replace(/etc__ABBR__/g, 'etc.')
+    .replace(/ETC__ABBR__/g, 'Etc.')
+    .replace(/No__ABBR__/g, 'No.')
+    .replace(/NO__ABBR__/g, 'No.');
+
+  let definition = restore((sentences.shift() || protectedText).trim());
+  let metricSignal = restore(sentences.join(' ').trim());
+
+  const actionReason = {
+    tool: 'Action type: Tool Calling, because the metric evaluates how the agent selects, invokes, executes, or depends on bounded API/tool calls.',
+    comp: 'Action type: Computer Use, because the metric is observed through an interactive UI, voice, screen, browser, EHR, or other live computer interface.',
+    code: 'Action type: Code Gen & Exec, because the metric evaluates code the agent writes, modifies, executes, verifies, or repairs.',
+    data: 'Action type: Data Interaction, because the metric would evaluate how the agent accesses, interprets, transforms, or limits healthcare data.',
+    ctx: 'Action type: Context & Hand-off, because the metric would evaluate what information is packaged, preserved, transformed, or disclosed during handoff.',
+    task: 'Action type: Task Execution, because the metric evaluates completion quality, throughput, or reliability of an end-to-end clinical or operational workflow.',
+    all: 'Action type: All types, because the metric is mechanism-agnostic and can be applied to tool calls, UI actions, code, data access, handoffs, and task deliverables.'
+  }[m.col] || `Action type: ${COL_LABELS[m.col]}, because the metric evaluates behavior specific to that action category.`;
+
+  const riskReason = {
+    priv: 'Risk domain: Data Privacy, because failure means the agent may expose, over-collect, mis-handle, or disclose sensitive information beyond the allowed boundary.',
+    liab: 'Risk domain: Liability & Irreversibility, because failure creates an incorrect, unauthorized, hard-to-reverse, or poorly auditable action that needs accountability.',
+    inj: 'Risk domain: Prompt Injection, because failure shows that external or adversarial instructions can redirect the agent away from the intended task.',
+    mal: 'Risk domain: Malicious Use, because failure indicates the agent can produce, enable, or fail to block harmful outputs or capabilities.',
+    third: 'Risk domain: Third-Party & Supply Chain, because failure depends on external tools, APIs, vendors, data sources, packages, or systems whose trustworthiness must be verified.',
+    agent: 'Risk domain: Agent-to-Agent, because failure can propagate across agents, coordination steps, shared context, or multi-agent decision pathways.'
+  }[m.risk] || `Risk domain: ${riskLabel(m.risk)}, because the metric directly measures that risk area.`;
+
+  let rationale = `${actionReason} ${riskReason}`;
+  if (metricSignal) {
+    rationale += ` Metric-specific signal: ${metricSignal}`;
+  }
+
+  return { definition, rationale };
+}
+
 function makeMetricCard(m) {
   const d = document.createElement('div');
+  const split = splitMetricText(m);
   d.className = 'metric-card';
   d.innerHTML = `
     <div class="card-name">${m.name}</div>
     <div class="card-tag">${m.cat.charAt(0).toUpperCase()+m.cat.slice(1)}</div>
     <div class="card-body">
-      <p>${m.desc}</p>
+      <div class="card-mapping">${riskLabel(m.risk)} × ${COL_LABELS[m.col]}</div>
+      <div class="card-section">
+        <span class="card-section-label">Definition</span>
+        <p>${split.definition}</p>
+      </div>
+      <div class="card-section">
+        <span class="card-section-label">Mapping rationale</span>
+        <p class="card-rationale">${split.rationale}</p>
+      </div>
       <span class="card-bench ${m.col}">${m.bench}</span>
     </div>`;
   d.addEventListener('click', () => d.classList.toggle('expanded'));
@@ -788,12 +883,21 @@ function makeGapCard(g) {
 
 function makeUniversalCard(m) {
   const d = document.createElement('div');
+  const split = splitMetricText(m);
   d.className = 'universal-card';
   d.innerHTML = `
     <div class="card-name">${m.name}</div>
     <div class="card-tag">${m.cat.charAt(0).toUpperCase()+m.cat.slice(1)} · ${riskLabel(m.risk)}</div>
     <div class="card-body">
-      <p>${m.desc}</p>
+      <div class="card-mapping">${riskLabel(m.risk)} × ${COL_LABELS[m.col]}</div>
+      <div class="card-section">
+        <span class="card-section-label">Definition</span>
+        <p>${split.definition}</p>
+      </div>
+      <div class="card-section">
+        <span class="card-section-label">Mapping rationale</span>
+        <p class="card-rationale">${split.rationale}</p>
+      </div>
       <span class="card-bench all">${m.bench}</span>
     </div>`;
   d.addEventListener('click', () => d.classList.toggle('expanded'));
