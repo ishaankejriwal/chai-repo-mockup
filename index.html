@@ -1087,29 +1087,29 @@ function splitMetricText(m) {
   let metricSignal = restore(sentences.join(' ').trim());
 
   const actionReason = {
-    tool: 'Action type: Tool Calling, because the metric evaluates how the agent selects, invokes, executes, or depends on bounded API/tool calls.',
-    comp: 'Action type: Computer Use, because the metric is observed through an interactive UI, voice, screen, browser, EHR, or other live computer interface.',
-    code: 'Action type: Code Gen & Exec, because the metric evaluates code the agent writes, modifies, executes, verifies, or repairs.',
-    data: 'Action type: Data Interaction, because the metric would evaluate how the agent accesses, interprets, transforms, or limits healthcare data.',
-    ctx: 'Action type: Context & Hand-off, because the metric would evaluate what information is packaged, preserved, transformed, or disclosed during handoff.',
-    task: 'Action type: Task Execution, because the metric evaluates completion quality, throughput, or reliability of an end-to-end clinical or operational workflow.',
-    all: 'Action type: All types, because the metric is mechanism-agnostic and can be applied to tool calls, UI actions, code, data access, handoffs, and task deliverables.'
-  }[m.col] || `Action type: ${COL_LABELS[m.col]}, because the metric evaluates behavior specific to that action category.`;
+    tool: 'Action type: Tool Calling. This metric tracks how the agent selects, invokes, and relies on bounded API/tool calls.',
+    comp: 'Action type: Computer Use. The metric is observed through live interaction with a UI, voice interface, screen, browser, or EHR.',
+    code: 'Action type: Code Gen & Exec. This metric applies to code the agent writes, modifies, executes, verifies, or repairs.',
+    data: 'Action type: Data Interaction. The metric captures how the agent accesses, interprets, transforms, or scopes healthcare data.',
+    ctx: 'Action type: Context & Hand-off. This metric looks at what information gets packaged, preserved, or disclosed when the agent hands off to another system or user.',
+    task: 'Action type: Task Execution. The metric measures completion quality, throughput, or reliability across an end-to-end clinical or operational workflow.',
+    all: 'Action type: All types. This metric is not specific to one mechanism and applies equally to tool calls, UI actions, code, data access, handoffs, and task outputs.'
+  }[m.col] || `Action type: ${COL_LABELS[m.col]}. The metric evaluates behavior specific to that action category.`;
 
   const riskReason = {
-    priv: 'Risk domain: Data Privacy, because failure means the agent may expose, over-collect, mis-handle, or disclose sensitive information beyond the allowed boundary.',
-    liab: 'Risk domain: Liability & Irreversibility, because failure creates an incorrect, unauthorized, hard-to-reverse, or poorly auditable action that needs accountability.',
-    inj: 'Risk domain: Prompt Injection, because failure shows that external or adversarial instructions can redirect the agent away from the intended task.',
-    mal: 'Risk domain: Malicious Use, because failure indicates the agent can produce, enable, or fail to block harmful outputs or capabilities.',
-    third: 'Risk domain: Third-Party & Supply Chain, because failure depends on external tools, APIs, vendors, data sources, packages, or systems whose trustworthiness must be verified.',
-    agent: 'Risk domain: Agent-to-Agent, because failure can propagate across agents, coordination steps, shared context, or multi-agent decision pathways.',
-    lps: 'Risk domain: Life & Patient Safety, because failure in this action type can directly affect care delivery, cause physical harm to a vulnerable patient population, or propagate errors through clinical IT workflows.',
-    tnd: 'Risk domain: Technology & Data, because failure exposes a risk to the confidentiality, integrity, or availability of health data and systems — including PHI exposure, data quality, security vulnerabilities, or undetectable AI influence on outputs.'
-  }[m.risk] || `Risk domain: ${riskLabel(m.risk)}, because the metric directly measures that risk area.`;
+    priv: 'Risk domain: Data Privacy. A gap here means the agent could expose, over-collect, or improperly disclose sensitive information outside its authorized boundary.',
+    liab: 'Risk domain: Liability & Irreversibility. A gap here can result in incorrect, unauthorized, or hard-to-reverse actions with unclear accountability.',
+    inj: 'Risk domain: Prompt Injection. A gap here means adversarial or external instructions could redirect the agent away from its intended task.',
+    mal: 'Risk domain: Malicious Use. A gap here indicates the agent may produce, enable, or fail to block harmful outputs or capabilities.',
+    third: 'Risk domain: Third-Party & Supply Chain. A gap here involves external tools, APIs, vendors, or data sources whose trustworthiness has not been verified.',
+    agent: 'Risk domain: Agent-to-Agent. A gap here can cascade across agents, shared context, or multi-agent decision paths.',
+    lps: 'Risk domain: Life & Patient Safety. A gap here can directly affect care delivery, cause physical harm to patients, or send errors downstream through clinical IT workflows.',
+    tnd: 'Risk domain: Technology & Data. A gap here puts at risk the confidentiality, integrity, or availability of health data and systems, including PHI exposure, data quality issues, security vulnerabilities, or undetectable AI influence on outputs.'
+  }[m.risk] || `Risk domain: ${riskLabel(m.risk)}. This metric directly measures that risk area.`;
 
   let rationale = `${actionReason} ${riskReason}`;
   if (metricSignal) {
-    rationale += ` Metric-specific signal: ${metricSignal}`;
+    rationale += ` Additional context: ${metricSignal}`;
   }
 
   return { definition, rationale };
