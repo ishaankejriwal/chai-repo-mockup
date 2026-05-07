@@ -113,8 +113,12 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .col-header.task  { background: var(--task-bg);  color: var(--task-text); }
 
 .row-label { padding: 12px 12px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; gap: 3px; }
-.row-label h3 { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.row-label h3 { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .row-label p  { font-size: 10px; color: var(--text-muted); line-height: 1.35; }
+.risk-type { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .45px; padding: 1px 6px; border-radius: 999px; border: 1px solid; line-height: 1.35; white-space: nowrap; }
+.risk-type.structural { background: color-mix(in srgb, var(--priv-accent) 10%, var(--surface)); color: var(--priv-accent); border-color: color-mix(in srgb, var(--priv-accent) 38%, var(--border)); }
+.risk-type.operating { background: color-mix(in srgb, var(--mal-accent) 10%, var(--surface)); color: var(--mal-accent); border-color: color-mix(in srgb, var(--mal-accent) 38%, var(--border)); }
+.risk-type.hybrid { background: color-mix(in srgb, var(--agent-accent) 10%, var(--surface)); color: var(--agent-accent); border-color: color-mix(in srgb, var(--agent-accent) 38%, var(--border)); }
 .row-label-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 .cell { padding: 8px 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
@@ -202,7 +206,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
     <span class="chai-badge">CHAI</span>
     <h1>Agentic AI — Unified T&amp;E Framework</h1>
   </div>
-  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>8 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories. The bottom 2 rows (Life &amp; Patient Safety; Technology &amp; Data) are newly added CHAI risk domains — metrics shared with existing rows are re-mapped with domain-specific rationales. The cross cutting metrics section below complements this structure by grouping metrics that apply broadly across agentic systems rather than a single action type. T&amp;E coverage gaps are marked explicitly throughout the framework. Click any card to expand definition, action-type rationale, risk-domain rationale, and benchmark details. Gap cards identify where evaluation coverage is missing.</p>
+  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>8 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories. The bottom 2 rows (Life &amp; Patient Safety; Technology &amp; Data) are newly added CHAI risk domains — metrics shared with existing rows are re-mapped with domain-specific rationales. The cross cutting metrics section below complements this structure by grouping metrics that apply broadly across agentic systems rather than a single action type. T&amp;E coverage gaps are marked explicitly throughout the framework. Click any card to expand definition, action-type rationale, risk-domain rationale, and benchmark details. Gap cards identify where evaluation coverage is missing. Each risk domain is tagged as Structural, Operating, or Hybrid to separate pre-deployment controls from runtime monitoring needs.</p>
 </div>
 
 <div class="controls">
@@ -231,6 +235,10 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
   <div class="legend-divider"></div>
   <div class="legend-item"><div class="legend-dot" style="background:#6d5ad4"></div> All types</div>
   <div class="legend-item"><div class="legend-dash"></div> Coverage gap</div>
+  <div class="legend-divider"></div>
+  <div class="legend-item"><span class="risk-type structural">Structural</span> Before agents run</div>
+  <div class="legend-item"><span class="risk-type operating">Operating</span> While agents run</div>
+  <div class="legend-item"><span class="risk-type hybrid">Hybrid</span> Before + during use</div>
 </div>
 
 <!-- MATRIX -->
@@ -246,7 +254,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 1: Data Privacy -->
   <div class="row-label risk-priv">
-    <h3><span class="row-label-dot" style="background:var(--priv-accent)"></span>Data Privacy</h3>
+    <h3><span class="row-label-dot" style="background:var(--priv-accent)"></span>Data Privacy <span class="risk-type structural">Structural</span></h3>
     <p>Access scope, exposure, least-privilege</p>
   </div>
   <div class="cell" id="priv-tool"></div>
@@ -258,7 +266,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 2: Liability -->
   <div class="row-label risk-liab">
-    <h3><span class="row-label-dot" style="background:var(--liab-accent)"></span>Liability &amp; Irreversibility</h3>
+    <h3><span class="row-label-dot" style="background:var(--liab-accent)"></span>Liability &amp; Irreversibility <span class="risk-type structural">Structural</span></h3>
     <p>Accountability, irreversible actions, oversight</p>
   </div>
   <div class="cell" id="liab-tool"></div>
@@ -270,7 +278,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 3: Prompt Injection -->
   <div class="row-label risk-inj">
-    <h3><span class="row-label-dot" style="background:var(--inj-accent)"></span>Prompt Injection</h3>
+    <h3><span class="row-label-dot" style="background:var(--inj-accent)"></span>Prompt Injection <span class="risk-type operating">Operating</span></h3>
     <p>Adversarial robustness, hijacked behavior</p>
   </div>
   <div class="cell" id="inj-tool"></div>
@@ -282,7 +290,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 4: Malicious Use -->
   <div class="row-label risk-mal">
-    <h3><span class="row-label-dot" style="background:var(--mal-accent)"></span>Malicious Use</h3>
+    <h3><span class="row-label-dot" style="background:var(--mal-accent)"></span>Malicious Use <span class="risk-type operating">Operating</span></h3>
     <p>Harmful outputs, weaponizable capabilities</p>
   </div>
   <div class="cell" id="mal-tool"></div>
@@ -294,7 +302,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 5: Third-Party -->
   <div class="row-label risk-third">
-    <h3><span class="row-label-dot" style="background:var(--third-accent)"></span>Third-Party &amp; Supply Chain</h3>
+    <h3><span class="row-label-dot" style="background:var(--third-accent)"></span>Third-Party &amp; Supply Chain <span class="risk-type structural">Structural</span></h3>
     <p>External tools, APIs, data source trust</p>
   </div>
   <div class="cell" id="third-tool"></div>
@@ -306,7 +314,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 6: Agent-to-Agent -->
   <div class="row-label risk-agent">
-    <h3><span class="row-label-dot" style="background:var(--agent-accent)"></span>Agent-to-Agent</h3>
+    <h3><span class="row-label-dot" style="background:var(--agent-accent)"></span>Agent-to-Agent <span class="risk-type operating">Operating</span></h3>
     <p>Multi-agent interactions, coordination, error propagation</p>
   </div>
   <div class="cell" id="agent-tool"></div>
@@ -318,7 +326,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 7: Life & Patient Safety -->
   <div class="row-label risk-lps">
-    <h3><span class="row-label-dot" style="background:var(--lps-accent)"></span>Life &amp; Patient Safety</h3>
+    <h3><span class="row-label-dot" style="background:var(--lps-accent)"></span>Life &amp; Patient Safety <span class="risk-type hybrid">Hybrid</span></h3>
     <p>Proximity to care, harm severity, vulnerable populations, override availability</p>
   </div>
   <div class="cell risk-lps" id="lps-tool"></div>
@@ -330,7 +338,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 
   <!-- ROW 8: Technology & Data -->
   <div class="row-label risk-tnd">
-    <h3><span class="row-label-dot" style="background:var(--tnd-accent)"></span>Technology &amp; Data</h3>
+    <h3><span class="row-label-dot" style="background:var(--tnd-accent)"></span>Technology &amp; Data <span class="risk-type structural">Structural</span></h3>
     <p>CIA triad, PHI exposure, data quality, security, lifecycle, AI traceability</p>
   </div>
   <div class="cell last-row risk-tnd" id="tnd-tool"></div>
