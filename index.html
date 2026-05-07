@@ -30,8 +30,12 @@
   --mal-accent: #e07b20;
   --third-accent: #8b5cf6;
   --agent-accent: #0891b2;
+  --lps-accent: #c0392b;
+  --tnd-accent: #0e7490;
+  --lps-bg: #fef2f2; --lps-border: #fca5a5; --lps-text: #7f1d1d; --lps-mid: #dc2626;
+  --tnd-bg: #ecfeff; --tnd-border: #67e8f9; --tnd-text: #164e63; --tnd-mid: #0e7490;
 
-  --gap-bg: #fffbeb; --gap-border: #fbbf24; --gap-text: #92400e;
+  --gap-bg: #fffbeb; --gap-border: #ffffff; --gap-text: #ffffff;
   --radius: 8px; --radius-sm: 5px;
 }
 
@@ -45,7 +49,9 @@
     --data-bg: #2d0a1a; --data-border: #7a2040; --data-text: #f48fb1; --data-mid: #e57399;
     --ctx-bg:  #1a0d2d; --ctx-border: #5a2880; --ctx-text: #ce93d8; --ctx-mid: #ab47bc;
     --task-bg: #00201f; --task-border: #004d40; --task-text: #80cbc4; --task-mid: #00897b;
-    --gap-bg: #2d2200; --gap-border: #a07000; --gap-text: #ffd180;
+    --gap-bg: #2d0000; --gap-border: #a00000; --gap-text: #ffffff;
+    --lps-bg: #3b0a0a; --lps-border: #7f1d1d; --lps-text: #fca5a5; --lps-mid: #ef4444;
+    --tnd-bg: #042f2e; --tnd-border: #0e7490; --tnd-text: #67e8f9; --tnd-mid: #06b6d4;
   }
 }
 
@@ -129,6 +135,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .risk-mal   .row-label { border-left: 3px solid var(--mal-accent); }
 .risk-third .row-label { border-left: 3px solid var(--third-accent); }
 .risk-agent .row-label { border-left: 3px solid var(--agent-accent); }
+.risk-lps   .row-label { border-left: 3px solid var(--lps-accent); background: color-mix(in srgb, var(--lps-bg) 30%, var(--surface)); }
+.risk-tnd   .row-label { border-left: 3px solid var(--tnd-accent); background: color-mix(in srgb, var(--tnd-bg) 30%, var(--surface)); }
+.risk-lps .cell { background: color-mix(in srgb, var(--lps-bg) 12%, var(--surface)); }
+.risk-tnd .cell { background: color-mix(in srgb, var(--tnd-bg) 12%, var(--surface)); }
+@media (prefers-color-scheme: dark) {
+  .risk-lps .cell { background: color-mix(in srgb, var(--lps-bg) 25%, var(--surface)); }
+  .risk-tnd .cell { background: color-mix(in srgb, var(--tnd-bg) 25%, var(--surface)); }
+}
 
 .metric-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 8px; margin-bottom: 5px; background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s; display: none; }
 .metric-card:last-child { margin-bottom: 0; }
@@ -166,7 +180,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .gap-card.expanded .card-body { display: block; }
 .gap-card .card-name { color: var(--gap-text); }
 .gap-card .card-tag  { color: #b45309; font-size: 10px; }
-@media (prefers-color-scheme: dark) { .gap-card .card-tag { color: #d4a017; } }
+@media (prefers-color-scheme: dark) { .gap-card .card-tag { color: #ffffff; } }
 .gap-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gap-text); margin-right: 4px; opacity: .7; }
 
 .universal-section { margin-bottom: 32px; }
@@ -188,7 +202,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
     <span class="chai-badge">CHAI</span>
     <h1>Agentic AI — Unified T&amp;E Framework</h1>
   </div>
-  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>6 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories — T&amp;E coverage gaps for these are marked explicitly. Click any card to expand definition, action-type rationale, risk-domain rationale, and benchmark details. Gap cards identify where evaluation coverage is missing.</p>
+  <p>Metrics from the CHAI T&amp;E framework mapped across <strong>6 action types</strong> × <strong>8 risk domains</strong>. The first 3 columns (Tool Calling, Computer Use, Code Gen) reflect agentic action mechanisms. The second 3 (Data Interaction, Context &amp; Hand-off, Task Execution) are CHAI healthcare agent skill categories. The bottom 2 rows (Life &amp; Patient Safety; Technology &amp; Data) are newly added CHAI risk domains — metrics shared with existing rows are re-mapped with domain-specific rationales. The cross cutting metrics section below complements this structure by grouping metrics that apply broadly across agentic systems rather than a single action type. T&amp;E coverage gaps are marked explicitly throughout the framework. Click any card to expand definition, action-type rationale, risk-domain rationale, and benchmark details. Gap cards identify where evaluation coverage is missing.</p>
 </div>
 
 <div class="controls">
@@ -295,12 +309,36 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
     <h3><span class="row-label-dot" style="background:var(--agent-accent)"></span>Agent-to-Agent</h3>
     <p>Multi-agent interactions, coordination, error propagation</p>
   </div>
-  <div class="cell last-row" id="agent-tool"></div>
-  <div class="cell last-row" id="agent-comp"></div>
-  <div class="cell last-row" id="agent-code"></div>
-  <div class="cell last-row data-col" id="agent-data"></div>
-  <div class="cell last-row ctx-col"  id="agent-ctx"></div>
-  <div class="cell last-row task-col" id="agent-task"></div>
+  <div class="cell" id="agent-tool"></div>
+  <div class="cell" id="agent-comp"></div>
+  <div class="cell" id="agent-code"></div>
+  <div class="cell data-col" id="agent-data"></div>
+  <div class="cell ctx-col"  id="agent-ctx"></div>
+  <div class="cell task-col" id="agent-task"></div>
+
+  <!-- ROW 7: Life & Patient Safety -->
+  <div class="row-label risk-lps">
+    <h3><span class="row-label-dot" style="background:var(--lps-accent)"></span>Life &amp; Patient Safety</h3>
+    <p>Proximity to care, harm severity, vulnerable populations, override availability</p>
+  </div>
+  <div class="cell risk-lps" id="lps-tool"></div>
+  <div class="cell risk-lps" id="lps-comp"></div>
+  <div class="cell risk-lps" id="lps-code"></div>
+  <div class="cell risk-lps data-col" id="lps-data"></div>
+  <div class="cell risk-lps ctx-col"  id="lps-ctx"></div>
+  <div class="cell risk-lps task-col" id="lps-task"></div>
+
+  <!-- ROW 8: Technology & Data -->
+  <div class="row-label risk-tnd">
+    <h3><span class="row-label-dot" style="background:var(--tnd-accent)"></span>Technology &amp; Data</h3>
+    <p>CIA triad, PHI exposure, data quality, security, lifecycle, AI traceability</p>
+  </div>
+  <div class="cell last-row risk-tnd" id="tnd-tool"></div>
+  <div class="cell last-row risk-tnd" id="tnd-comp"></div>
+  <div class="cell last-row risk-tnd" id="tnd-code"></div>
+  <div class="cell last-row risk-tnd data-col" id="tnd-data"></div>
+  <div class="cell last-row risk-tnd ctx-col"  id="tnd-ctx"></div>
+  <div class="cell last-row risk-tnd task-col" id="tnd-task"></div>
 
 </div>
 
@@ -716,6 +754,143 @@ const METRICS = [
     bench:"CUL ≤ 0.05 (PyCFRL baseline: 0.407 Full / 0.446 Unaware → fair policy achieved 0.042); arxiv 2510.06935",
     lit:"https://arxiv.org/pdf/2510.06935" },
 
+  /* ── LIFE & PATIENT SAFETY ────────────────────────────────────────
+     Risk domain: Physical/operational proximity to patient care, harm severity,
+     vulnerable populations, human override availability, error propagation in health IT.
+  ─────────────────────────────────────────────────────────────────── */
+
+  // lps-tool: TCR-T — failure = authorized clinical task not completed; care not delivered
+  { name:"Task Completion Rate with Tool Use (TCR-T)", abbr:"TCR-T", col:"tool", cat:"efficacy", risk:"lps",
+    desc:"Whether the agent achieves the correct end goal after tool interactions — evaluated on final environment state, not intermediate steps. In clinical tool-calling contexts, failure means an authorized care task (scheduling, medication lookup, order submission) was not completed, directly affecting patient access to care.",
+    bench:"TCR-T ≥ 0.75 on multi-step tool-use benchmarks",
+    lit:"https://arxiv.org/abs/2507.21504" },
+
+  // lps-tool: ESR — human override mechanism before irreversible clinical action
+  { name:"Escalation Rate (ESR)", abbr:"ESR", col:"tool", cat:"safety", risk:"lps",
+    desc:"Proportion of agent interactions transferred to a live human agent. In clinical tool-calling workflows, escalation is the primary human-override safety valve: the agent recognizes it cannot safely proceed and hands off before taking an irreversible action affecting patient care.",
+    bench:"Escalation-based fallback pipelines reduced agent failure rates ~50% on tau-bench",
+    lit:"https://arxiv.org/pdf/2406.12045" },
+
+  // lps-tool: HTLCR — runaway tool loops that bypass human oversight in clinical settings
+  { name:"Hard Turn Limit Compliance Rate (HTLCR)", abbr:"HTLCR", col:"tool", cat:"safety", risk:"lps",
+    desc:"Proportion of calls where the agent triggers a handoff before the defined maximum turn count. Runaway context-overflow loops in clinical tool-calling agents bypass human oversight and risk executing unintended actions within care-affecting workflows.",
+    bench:"Target 100% compliance",
+    lit:"https://direct.mit.edu/tacl/article/doi/10.1162/tacl_a_00638/119630/Lost-in-the-Middle-How-Language-Models-Use-Long" },
+
+  // lps-comp: TLSCAS — CDS action directly affects patient safety; must be both safe and accurate
+  { name:"Task-Level Safety & Clinical Accuracy (TLSCAS)", abbr:"TLSCAS", col:"comp", cat:"safety", risk:"lps",
+    desc:"Percentage of agentic CDS actions that are both clinically safe and clinically accurate. CDS systems operate in immediate proximity to care; unsafe or inaccurate autonomous clinical decisions delivered through a computer interface can directly harm patients with no buffer between AI output and care action.",
+    bench:"TLSCAS ≥ 0.95; evaluated over validated clinical scenario sets with clinician consensus labels",
+    lit:"https://pubmed.ncbi.nlm.nih.gov/40909853/" },
+
+  // lps-comp: TAR — wrong triage directly endangers vulnerable patients
+  { name:"Triage Appropriateness Rate", abbr:"TAR", col:"comp", cat:"efficacy", risk:"lps",
+    desc:"Proportion of AI-assisted triage decisions that correctly prioritize patient urgency compared to final clinical assessment. Triage determines the time available to respond to a patient's condition — a wrong routing delays time-sensitive care for the most vulnerable patients.",
+    bench:"AI-assisted triage: 89.3% vs. 74.7% with traditional triage",
+    lit:"https://pmc.ncbi.nlm.nih.gov/articles/PMC12859347/" },
+
+  // lps-comp: PPE PNA-F1 — physical safety of patients and healthcare workers
+  { name:"PPE Non-Compliance Alert F1 (PNA-F1)", abbr:"PNA-F1", col:"comp", cat:"safety", risk:"lps",
+    desc:"Precision-recall F1 for agentic vision systems monitoring live video for PPE violations. PPE compliance directly protects the physical safety of patients and healthcare workers — missed violations put vulnerable inpatient populations at immediate infection or injury risk.",
+    bench:"YOLO-based hybrid dataset models: mAP@50 of 83.1%; target PNA-F1 ≥ 0.90",
+    lit:"https://www.mdpi.com/2075-5309/15/22/4084" },
+
+  // lps-comp: E2E Latency — time available to respond to incorrect output in acute care
+  { name:"End-to-End Clinical Agent Response Latency", abbr:"E2E-Latency", col:"comp", cat:"efficiency", risk:"lps",
+    desc:"Elapsed time between clinician case submission and receipt of the agent's recommendation. In acute clinical contexts, response latency that exceeds safe windows removes the time available for a human to review and override an incorrect output before it affects care.",
+    bench:"Observed 5–7 seconds under live WhatsApp deployment",
+    lit:"https://pmc.ncbi.nlm.nih.gov/articles/PMC12692458/" },
+
+  // lps-code: RNIR — silent regressions in clinical code = unchecked patient harm path
+  { name:"Regression Non-Introduction Rate (RNIR)", abbr:"RNIR", col:"code", cat:"safety", risk:"lps",
+    desc:"Proportion of agent-generated code patches that fix the target issue without breaking any previously passing tests. In clinical software, silent regressions introduced by autonomous code generation can alter care pathways, disable safety checks, or corrupt patient data — harms that propagate through health IT before detection.",
+    bench:"SWE-bench Verified: top models achieve ~70%+ FAIL-TO-PASS; PASS-TO-PASS degrades on complex edits",
+    lit:"https://arxiv.org/pdf/2310.06770" },
+
+  // lps-code: EVBR — unverified assumptions in clinical code = actions on wrong patient context
+  { name:"Epistemic Verification Behavior Rate", abbr:"EVBR", col:"code", cat:"safety", risk:"lps",
+    desc:"Proportion of decision steps where the agent explicitly distinguishes verified facts from assumptions before acting. In clinical code-generation, executing code built on unverified assumptions about patient data or care context can direct treatment logic at the wrong population, producing harm that is difficult to detect and reverse.",
+    bench:"No standardized threshold; APEX-SWE qualitatively shows top agents consistently apply verification",
+    lit:"https://arxiv.org/pdf/2601.08806" },
+
+  // lps-task: SEER — clinician acting on untrustworthy AI summary = uninformed care decision
+  { name:"Summarization Editing Effort Reduction", abbr:"SEER", col:"task", cat:"efficiency", risk:"lps",
+    desc:"Percentage reduction in edits required by clinicians to improve AI-generated clinical summaries. High editing burden indicates the agent's autonomous summary output is not trustworthy without substantial human review — a clinician acting on an unreviewed summary may make care decisions that harm the patient.",
+    bench:"LLM-generated drafts: 31.5% mean editing vs. 44.8% for physician drafts",
+    lit:"https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2837483" },
+
+  // lps-task: CR-SFC — missing facts in clinical summary = uninformed clinical action
+  { name:"Claim Recall for Summary Factual Coverage", abbr:"CR-SFC", col:"task", cat:"usability", risk:"lps",
+    desc:"Proportion of atomic reference claims supported by the generated clinical summary. Missing facts in agent-generated clinical summaries are a direct patient safety risk: a clinician acting on an incomplete summary may lack the information required to make a safe care decision.",
+    bench:"Baseline LLMs: 20–30% claim recall on long-form summarization benchmarks",
+    lit:"https://arxiv.org/html/2508.13798v1" },
+
+  // lps-task: ISCR — wrong step in clinical workflow = error propagation through care process
+  { name:"Intermediate Step Correctness Rate", abbr:"ISCR", col:"task", cat:"safety", risk:"lps",
+    desc:"Proportion of intermediate reasoning steps in a multi-step agentic workflow that are logically correct and aligned with the task objective. In clinical task execution, incorrect intermediate steps can propagate errors through health IT workflows — creating downstream harm even when a final output appears superficially correct.",
+    bench:"Study reports intermediate progress tracking without a fixed threshold",
+    lit:"https://arxiv.org/pdf/2412.17259" },
+
+  /* ── TECHNOLOGY & DATA ────────────────────────────────────────────
+     Risk domain: CIA triad (confidentiality, integrity, availability), PHI sensitivity &
+     identifiability, data quality for model operation, security from data handling and
+     model updates, lifecycle management, monitoring/incident detection, AI traceability.
+  ─────────────────────────────────────────────────────────────────── */
+
+  // tnd-tool: OCVR — PHI boundary violations; confidentiality of identified patient data
+  { name:"Output Constraint Violation Rate (OCVR)", abbr:"OCVR", col:"tool", cat:"safety", risk:"tnd",
+    desc:"Proportion of turns where agent output violates a predefined output boundary policy — e.g. surfacing internal reasoning, disclosing slot values (DOB, insurance ID) outside the confirmed flow. Each violation represents a confidentiality breach of identifiable patient data from the tool-calling layer.",
+    bench:"Target 0% critical violations",
+    lit:"https://arxiv.org/pdf/2310.17884" },
+
+  // tnd-tool: SEF1 — PII/PHI data quality for model training and operation
+  { name:"Slot Extraction F1 (SEF1)", abbr:"SEF1", col:"tool", cat:"efficacy", risk:"tnd",
+    desc:"Harmonic mean of precision and recall for entity-level slot extraction. PII/PHI fields — date of birth, insurance ID, medication names — extracted incorrectly degrade the data quality on which downstream model operation and clinical decision logic depends, undermining integrity of the health data pipeline.",
+    bench:"SEF1 ≥ 0.74 on held-out conversational dialogue",
+    lit:"https://arxiv.org/pdf/2411.18980" },
+
+  // tnd-tool: E2E Trace Coverage — monitoring/incident detection and AI influence traceability
+  { name:"End-to-End Trace Coverage Rate", abbr:"E2E-Trace", col:"tool", cat:"transparency", risk:"tnd",
+    desc:"All call events — intake, intent classification, tool calls, slot actions, escalations, confirmations — logged with session ID, span ID, timestamp, and output. Complete trace coverage is the foundation of monitoring, incident detection and response, and the ability to detect and trace when AI is influencing outputs or downstream workflows.",
+    bench:"100% session coverage; HIPAA 6-year retention",
+    lit:"https://arxiv.org/pdf/2411.05285" },
+
+  // tnd-tool: NLTCR — lifecycle management and update controls before production promotion
+  { name:"Node-Level Regression Test Coverage Rate", abbr:"NLTCR", col:"tool", cat:"safety", risk:"tnd",
+    desc:"Each discrete decision node in the scheduling workflow is assigned a locked regression test suite. Coverage = nodes with active versioned test suites / total nodes. This is the primary lifecycle management control: 100% coverage is required before any model or prompt update goes to production, ensuring update integrity.",
+    bench:"100% node coverage required before production promotion",
+    lit:"https://arxiv.org/abs/2411.13768" },
+
+  // tnd-tool: Pass@k — availability and reliability of the tool-calling system across repeated runs
+  { name:"Pass@k Reliability for Agentic Financial Tasks", abbr:"Pass@k", col:"tool", cat:"safety", risk:"tnd",
+    desc:"Probability the agent succeeds at least once over k independent runs with identical inputs. Stochastic availability failures on tool-calling tasks are a technology risk: single-run reporting masks system unreliability that would surface under production load conditions, creating hidden gaps in system availability.",
+    bench:"Pass@k ≥ 0.90 for k=5 repeated runs on identical financial tasks",
+    lit:"https://arxiv.org/pdf/2511.14136" },
+
+  // tnd-comp: PRS — availability (CIA triad) and audit trail integrity
+  { name:"Platform Reliability Score (PRS)", abbr:"PRS", col:"comp", cat:"safety", risk:"tnd",
+    desc:"Composite of uptime %, MTBF, and unplanned incident rate for the computer-use/voice agent platform. Infrastructure downtime directly degrades availability — one of the three CIA triad pillars — and creates gaps in audit trails, undermining the monitoring and incident detection controls required under HIPAA.",
+    bench:"Uptime ≥ 99.9%; analysis of 80,381 patient safety event reports found 76 IT downtime-related events",
+    lit:"https://pmc.ncbi.nlm.nih.gov/articles/PMC7647128/" },
+
+  // tnd-code: Proportion of Errors Auto-Corrected — security risk reduction via self-correction
+  { name:"Proportion of Errors Auto-Corrected", abbr:"PEAC", col:"code", cat:"usability", risk:"tnd",
+    desc:"Fraction of detected errors for which the AI system also provides a correct automated fix without human intervention. In code-generation agents, errors not auto-corrected persist as potential security vulnerabilities or data integrity flaws until a human review cycle catches them — widening the window of exposure.",
+    bench:"~75.8% of flagged errors correctly auto-corrected by the AI Checker system",
+    lit:"https://arxiv.org/abs/2512.05925" },
+
+  // tnd-task: Per-Record Processing Time — system availability and performance monitoring
+  { name:"Per-Record Processing Time", abbr:"PRPT", col:"task", cat:"efficiency", risk:"tnd",
+    desc:"Average time to process a single clinical input record in an automated risk stratification pipeline. Throughput and latency metrics are the primary operational signals for availability monitoring and incident detection — unexpected spikes indicate system degradation requiring investigation.",
+    bench:"Mean 0.18 ms; CV <5% on standard hardware",
+    lit:"https://www.jmir.org/2025/1/e77858" },
+
+  // tnd-task: RPM Devices — data quality from each new device type; each = new PHI data dependency
+  { name:"Number of Integrated Wearable / RPM Device Types", abbr:"RPM-Devices", col:"task", cat:"usability", risk:"tnd",
+    desc:"Count of distinct wearable or remote patient monitoring device classes successfully integrated. Each additional device type introduces a new source of PHI data with its own sensitivity, identifiability, and data quality profile — expanding the technology and data risk surface that must be secured and validated.",
+    bench:"Prototype: ≥ 2 distinct device sources (smartwatch + video/camera)",
+    lit:"https://arxiv.org/abs/2510.21445" },
+
 ];
 /* ═══════════ GAPS ═══════════
    Gap cards for cells with no T&E metric mapped.
@@ -798,6 +973,34 @@ const GAPS = [
     desc:"No metric evaluates whether task execution agents resist attempts to redirect them to perform unauthorized clinical actions through manipulated inputs." },
   { cell:"agent-task", name:"Sub-Agent Coordination Failure Attribution Rate",
     desc:"No metric identifies which sub-agent in a multi-agent clinical task pipeline caused a coordination failure — making post-incident accountability difficult." },
+
+  /* Life & Patient Safety gaps */
+  { cell:"lps-data",  name:"Health IT Error Propagation Rate",
+    desc:"No metric tracks how often a data-interaction agent's incorrect read or transformation propagates an error into downstream clinical workflows — the primary health IT error-propagation risk surface for this risk domain." },
+  { cell:"lps-ctx",   name:"Clinically Critical Context Preservation Rate",
+    desc:"No metric measures whether handoff context packages preserve the specific fields a receiving clinician needs to make a safe care decision — omission of allergy, medication, or acuity data has direct patient safety consequences." },
+  { cell:"lps-tool",  name:"Patient Harm Disparity Rate (Tool-Calling)",
+    desc:"No metric evaluates whether tool-calling failures disproportionately affect vulnerable or protected patient populations — e.g., higher scheduling failure rates for elderly or non-English-speaking patients." },
+  { cell:"lps-code",  name:"Clinical Code Pathway Proximity Score",
+    desc:"No metric characterizes how closely agent-generated code operates to direct patient care pathways — a critical factor in determining the severity of harm if the generated code contains errors." },
+  { cell:"lps-task",  name:"Vulnerable Population Harm Rate",
+    desc:"No metric captures whether task execution failures — incorrect summaries, workflow errors, missed steps — disproportionately affect high-vulnerability patient groups such as pediatric, geriatric, or immunocompromised populations." },
+  { cell:"lps-comp",  name:"Population Monitoring Coverage Gap Rate",
+    desc:"No metric measures the proportion of at-risk patients who fall outside the computer-use agent's active monitoring window — an oversight gap that determines the breadth of potential patient harm." },
+
+  /* Technology & Data gaps */
+  { cell:"tnd-tool",  name:"Model/Prompt Update Security Audit Rate",
+    desc:"No metric verifies that each tool-calling model or prompt update undergoes a security review before deployment — a lifecycle management gap that could allow undetected vulnerabilities to reach production." },
+  { cell:"tnd-comp",  name:"Computer-Use Agent Lifecycle Audit Coverage",
+    desc:"No metric tracks whether computer-use agents operating in clinical environments receive periodic security reviews, version-pinned deployments, and incident response testing as part of their operational lifecycle." },
+  { cell:"tnd-code",  name:"Training/Validation Data Transparency Score",
+    desc:"No metric quantifies the transparency of training and validation data used for code-generation models — including provenance, de-identification status, and coverage of the clinical domains where generated code will execute." },
+  { cell:"tnd-data",  name:"PHI Data Quality Index",
+    desc:"No metric aggregates completeness, accuracy, consistency, and timeliness of PHI data used by data-interaction agents — data quality failures here directly degrade model performance on clinical decisions." },
+  { cell:"tnd-ctx",   name:"AI Influence Detectability Rate (Context & Handoff)",
+    desc:"No metric measures whether downstream recipients — clinicians or other agents — can identify which portions of a handoff context package were AI-generated vs. sourced from verified records, a key traceability requirement." },
+  { cell:"tnd-task",  name:"Task-Level Incident Detection Latency",
+    desc:"No metric measures how quickly anomalous task execution outputs — indicative of a security incident or data integrity failure — are detected by monitoring systems, a gap in the incident detection and response framework." },
 ];
 
 /* ── State ── */
@@ -899,7 +1102,9 @@ function splitMetricText(m) {
     inj: 'Risk domain: Prompt Injection, because failure shows that external or adversarial instructions can redirect the agent away from the intended task.',
     mal: 'Risk domain: Malicious Use, because failure indicates the agent can produce, enable, or fail to block harmful outputs or capabilities.',
     third: 'Risk domain: Third-Party & Supply Chain, because failure depends on external tools, APIs, vendors, data sources, packages, or systems whose trustworthiness must be verified.',
-    agent: 'Risk domain: Agent-to-Agent, because failure can propagate across agents, coordination steps, shared context, or multi-agent decision pathways.'
+    agent: 'Risk domain: Agent-to-Agent, because failure can propagate across agents, coordination steps, shared context, or multi-agent decision pathways.',
+    lps: 'Risk domain: Life & Patient Safety, because failure in this action type can directly affect care delivery, cause physical harm to a vulnerable patient population, or propagate errors through clinical IT workflows.',
+    tnd: 'Risk domain: Technology & Data, because failure exposes a risk to the confidentiality, integrity, or availability of health data and systems — including PHI exposure, data quality, security vulnerabilities, or undetectable AI influence on outputs.'
   }[m.risk] || `Risk domain: ${riskLabel(m.risk)}, because the metric directly measures that risk area.`;
 
   let rationale = `${actionReason} ${riskReason}`;
@@ -1011,7 +1216,8 @@ function makeUniversalCard(m) {
 
 function riskLabel(r) {
   return { priv:'Data Privacy', liab:'Liability', inj:'Prompt Injection',
-           mal:'Malicious Use', third:'Third-Party', agent:'Agent-to-Agent' }[r] || r;
+           mal:'Malicious Use', third:'Third-Party', agent:'Agent-to-Agent',
+           lps:'Life & Patient Safety', tnd:'Technology & Data' }[r] || r;
 }
 
 function filterCat(btn, cat) {
