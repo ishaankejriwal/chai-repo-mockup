@@ -32,8 +32,12 @@
   --agent-accent: #0891b2;
   --lps-accent: #c0392b;
   --tnd-accent: #0e7490;
+  --aut-accent: #b45309;
+  --fin-accent: #166534;
   --lps-bg: #fef2f2; --lps-border: #fca5a5; --lps-text: #7f1d1d; --lps-mid: #dc2626;
   --tnd-bg: #ecfeff; --tnd-border: #67e8f9; --tnd-text: #164e63; --tnd-mid: #0e7490;
+  --aut-bg: #fffbeb; --aut-border: #fcd34d; --aut-text: #78350f; --aut-mid: #d97706;
+  --fin-bg: #f0fdf4; --fin-border: #86efac; --fin-text: #14532d; --fin-mid: #16a34a;
 
   --gap-bg: #fffbeb; --gap-border: #ffffff; --gap-text: #ffffff;
   --radius: 8px; --radius-sm: 5px;
@@ -52,6 +56,8 @@
     --gap-bg: #2d0000; --gap-border: #a00000; --gap-text: #ffffff;
     --lps-bg: #3b0a0a; --lps-border: #7f1d1d; --lps-text: #fca5a5; --lps-mid: #ef4444;
     --tnd-bg: #042f2e; --tnd-border: #0e7490; --tnd-text: #67e8f9; --tnd-mid: #06b6d4;
+    --aut-bg: #2d1a00; --aut-border: #92400e; --aut-text: #fcd34d; --aut-mid: #f59e0b;
+    --fin-bg: #052e16; --fin-border: #166534; --fin-text: #86efac; --fin-mid: #22c55e;
   }
 }
 
@@ -141,11 +147,17 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .risk-agent .row-label { border-left: 3px solid var(--agent-accent); }
 .risk-lps   .row-label { border-left: 3px solid var(--lps-accent); background: color-mix(in srgb, var(--lps-bg) 30%, var(--surface)); }
 .risk-tnd   .row-label { border-left: 3px solid var(--tnd-accent); background: color-mix(in srgb, var(--tnd-bg) 30%, var(--surface)); }
+.risk-aut   .row-label { border-left: 3px solid var(--aut-accent); background: color-mix(in srgb, var(--aut-bg) 30%, var(--surface)); }
+.risk-fin   .row-label { border-left: 3px solid var(--fin-accent); background: color-mix(in srgb, var(--fin-bg) 30%, var(--surface)); }
 .risk-lps .cell { background: color-mix(in srgb, var(--lps-bg) 12%, var(--surface)); }
 .risk-tnd .cell { background: color-mix(in srgb, var(--tnd-bg) 12%, var(--surface)); }
+.risk-aut .cell { background: color-mix(in srgb, var(--aut-bg) 12%, var(--surface)); }
+.risk-fin .cell { background: color-mix(in srgb, var(--fin-bg) 12%, var(--surface)); }
 @media (prefers-color-scheme: dark) {
   .risk-lps .cell { background: color-mix(in srgb, var(--lps-bg) 25%, var(--surface)); }
   .risk-tnd .cell { background: color-mix(in srgb, var(--tnd-bg) 25%, var(--surface)); }
+  .risk-aut .cell { background: color-mix(in srgb, var(--aut-bg) 25%, var(--surface)); }
+  .risk-fin .cell { background: color-mix(in srgb, var(--fin-bg) 25%, var(--surface)); }
 }
 
 .metric-card { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 8px; margin-bottom: 5px; background: var(--surface); cursor: pointer; transition: border-color .12s, background .12s; display: none; }
@@ -341,12 +353,36 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
     <h3><span class="row-label-dot" style="background:var(--tnd-accent)"></span>Technology &amp; Data <span class="risk-type structural">Structural</span></h3>
     <p>CIA triad, PHI exposure, data quality, security, lifecycle, AI traceability</p>
   </div>
-  <div class="cell last-row risk-tnd" id="tnd-tool"></div>
-  <div class="cell last-row risk-tnd" id="tnd-comp"></div>
-  <div class="cell last-row risk-tnd" id="tnd-code"></div>
-  <div class="cell last-row risk-tnd data-col" id="tnd-data"></div>
-  <div class="cell last-row risk-tnd ctx-col"  id="tnd-ctx"></div>
-  <div class="cell last-row risk-tnd task-col" id="tnd-task"></div>
+  <div class="cell risk-tnd" id="tnd-tool"></div>
+  <div class="cell risk-tnd" id="tnd-comp"></div>
+  <div class="cell risk-tnd" id="tnd-code"></div>
+  <div class="cell risk-tnd data-col" id="tnd-data"></div>
+  <div class="cell risk-tnd ctx-col"  id="tnd-ctx"></div>
+  <div class="cell risk-tnd task-col" id="tnd-task"></div>
+
+  <!-- ROW 9: Autonomy & Delegated Authority -->
+  <div class="row-label risk-aut">
+    <h3><span class="row-label-dot" style="background:var(--aut-accent)"></span>Autonomy &amp; Delegated Authority <span class="risk-type hybrid">Hybrid</span></h3>
+    <p>Action scope, escalation triggers, delegation depth, oversight boundaries, behavioral drift</p>
+  </div>
+  <div class="cell risk-aut" id="aut-tool"></div>
+  <div class="cell risk-aut" id="aut-comp"></div>
+  <div class="cell risk-aut" id="aut-code"></div>
+  <div class="cell risk-aut data-col" id="aut-data"></div>
+  <div class="cell risk-aut ctx-col"  id="aut-ctx"></div>
+  <div class="cell risk-aut task-col" id="aut-task"></div>
+
+  <!-- ROW 10: Financial Harm & Market Integrity -->
+  <div class="row-label risk-fin">
+    <h3><span class="row-label-dot" style="background:var(--fin-accent)"></span>Financial Harm &amp; Market Integrity <span class="risk-type operating">Operating</span></h3>
+    <p>Payment errors, unauthorized transactions, discriminatory financial outcomes, market stability</p>
+  </div>
+  <div class="cell last-row risk-fin" id="fin-tool"></div>
+  <div class="cell last-row risk-fin" id="fin-comp"></div>
+  <div class="cell last-row risk-fin" id="fin-code"></div>
+  <div class="cell last-row risk-fin data-col" id="fin-data"></div>
+  <div class="cell last-row risk-fin ctx-col"  id="fin-ctx"></div>
+  <div class="cell last-row risk-fin task-col" id="fin-task"></div>
 
 </div>
 
@@ -899,6 +935,154 @@ const METRICS = [
     bench:"Prototype: ≥ 2 distinct device sources (smartwatch + video/camera)",
     lit:"https://arxiv.org/abs/2510.21445" },
 
+  /* ── AUTONOMY & DELEGATED AUTHORITY ──────────────────────────────
+     Risk domain: Risks created when an agentic AI system is allowed to act with
+     operational independence — including deciding when to use tools, when to escalate,
+     when to delegate to sub-agents, and whether every autonomous action can be traced
+     back to a responsible human or governance authority. Covers action scope creep,
+     missing or delayed human oversight, behavioral drift, and unclear accountability
+     across long-running workflows or delegation chains.
+  ────────────────────────────────────────────────────────────────── */
+
+  // aut-tool: ESR — the primary human-oversight valve before irreversible autonomous tool action
+  { name:"Escalation Rate (ESR)", abbr:"ESR", col:"tool", cat:"safety", risk:"aut",
+    desc:"Proportion of agent interactions transferred to a live human agent. In autonomy-scoped tool-calling workflows, escalation is the primary mechanism by which the agent enforces the boundary of its delegated authority — triggering handoff rather than proceeding independently when a tool action exceeds its authorized scope.",
+    bench:"Escalation-based fallback pipelines reduced agent failure rates ~50% on tau-bench",
+    lit:"https://arxiv.org/pdf/2406.12045" },
+
+  // aut-tool: HTLCR — hard ceiling on how far an agent can run without oversight
+  { name:"Hard Turn Limit Compliance Rate (HTLCR)", abbr:"HTLCR", col:"tool", cat:"safety", risk:"aut",
+    desc:"Proportion of calls where the agent triggers a handoff before the defined maximum turn count. The turn limit operationalizes the time horizon of delegated authority: once reached, the agent must return control to a human regardless of whether it believes it can proceed.",
+    bench:"Target 100% compliance; no validated production benchmark in peer-reviewed literature",
+    lit:"https://direct.mit.edu/tacl/article/doi/10.1162/tacl_a_00638/119630/Lost-in-the-Middle-How-Language-Models-Use-Long" },
+
+  // aut-tool: BPAR — autonomous tool actions must stay within explicitly authorized policy boundaries
+  { name:"Business Policy Adherence Rate (BPAR)", abbr:"BPAR", col:"tool", cat:"safety", risk:"aut",
+    desc:"Proportion of multi-turn agentic interactions completed without any policy-violating tool action. Directly measures whether the agent's autonomous tool use remains within its delegated operational boundaries — policy violations are the clearest indicator that autonomous scope has exceeded authorization.",
+    bench:"Multi-domain enterprise benchmark; GPT-4o <50% on retail domain",
+    lit:"https://arxiv.org/abs/2406.12045" },
+
+  // aut-tool: E2E-Trace — every autonomous action must be traceable to a responsible authority
+  { name:"End-to-End Trace Coverage Rate", abbr:"E2E-Trace", col:"tool", cat:"transparency", risk:"aut",
+    desc:"All call events — intake, tool calls, slot actions, escalations, confirmations — logged with session ID, span ID, timestamp, and output. Complete trace coverage is the foundational requirement for delegated authority: without it, no post-hoc audit can establish whether every autonomous action was within authorized scope.",
+    bench:"100% session coverage; HIPAA 6-year retention",
+    lit:"https://arxiv.org/pdf/2411.05285" },
+
+  // aut-comp: HIR — every human override in a computer-use workflow is evidence autonomy exceeded its appropriate scope
+  { name:"Human Intervention Rate (HIR)", abbr:"HIR", col:"comp", cat:"efficacy", risk:"aut",
+    desc:"Proportion of agent-executed steps requiring human correction, override, or manual intervention. In computer-use workflows, each override is a signal that the agent's autonomy level was not properly matched to the action's consequence — the CSA/NIST Agentic Profile cites this as a key indicator of permission escalation.",
+    bench:"Compared against human-only workflows and baseline agents",
+    lit:"https://arxiv.org/abs/2308.08155" },
+
+  // aut-comp: CVR — formal constraint violations are the direct measure of agents acting outside delegated authority
+  { name:"Constraint Violation Rate (CVR)", abbr:"CVR", col:"comp", cat:"safety", risk:"aut",
+    desc:"Frequency with which a computer-use agent violates formal safety or ethical constraints while optimizing for task goals. In autonomy terms, constraint violations are the clearest evidence that the agent acted outside its delegated authority — the system pursued an objective beyond the scope it was granted.",
+    bench:"CVR ≤ 0.10 across 40 benchmark scenarios",
+    lit:"https://arxiv.org/abs/2512.20798" },
+
+  // aut-comp: GAS — goal drift over long-horizon UI interactions means the agent has departed from its authorized objective
+  { name:"Goal Adherence Score (GAS)", abbr:"GAS", col:"comp", cat:"safety", risk:"aut",
+    desc:"Degree to which the agent's behavior remains aligned with its original objective over a multi-step computer-use trajectory. Behavioral drift detected by GAS is the autonomy-domain signal that the agent has departed from its assigned objective without authorization — the CSA/NIST Agentic Profile flags this as a key telemetry indicator.",
+    bench:"GAS ≥ 0.90 across long-horizon evaluation scenarios",
+    lit:"https://arxiv.org/html/2505.02709v1" },
+
+  // aut-code: Pass@1 — single-attempt execution without human review; retries expand autonomous scope
+  { name:"Pass@1 Task Completion Rate", abbr:"Pass@1", col:"code", cat:"safety", risk:"aut",
+    desc:"Proportion of real-world software tasks completed successfully on the first attempt without retries. In code-execution contexts, each retry is an additional autonomous action not covered by the original delegation — agents that require repeated attempts are operating beyond the scope of a single authorized execution.",
+    bench:"Pass@1 ≥ 0.40 based on APEX-SWE leaderboard for complex tasks",
+    lit:"https://arxiv.org/pdf/2601.08806" },
+
+  // aut-code: EVBR — acting on unverified assumptions in code is the autonomy equivalent of exceeding delegation; agent invents authority it was not given
+  { name:"Epistemic Verification Behavior Rate", abbr:"EVBR", col:"code", cat:"safety", risk:"aut",
+    desc:"Proportion of decision steps where the agent explicitly distinguishes verified facts from assumptions before acting. In code-generation contexts, executing code based on unverified assumptions is the autonomy equivalent of self-expanding scope — the agent acts on authority it was not given rather than stopping to verify.",
+    bench:"No standardized threshold; APEX-SWE qualitatively shows top agents consistently apply verification",
+    lit:"https://arxiv.org/pdf/2601.08806" },
+
+  // aut-task: PAS — out-of-plan steps in task execution mean the agent is autonomously improvising beyond its authorized procedure
+  { name:"Plan Adherence Score (PAS)", abbr:"PAS", col:"task", cat:"safety", risk:"aut",
+    desc:"Proportion of planned steps executed in the correct order without omission or deviation. In task execution, unplanned steps are the core autonomy risk: the agent is improvising actions that were not part of the delegated procedure, expanding its operational scope without authorization.",
+    bench:"PAS ≥ 0.85 across representative trajectory datasets",
+    lit:"https://arxiv.org/abs/2510.08847" },
+
+  // aut-task: SCR — step-level correctness is the process accountability signal for every action in a delegated task
+  { name:"Step Correctness Rate (SCR)", abbr:"SCR", col:"task", cat:"safety", risk:"aut",
+    desc:"Proportion of intermediate trajectory steps labeled correct by human evaluators. In delegated task execution, step-level correctness provides the granular audit trail needed to establish whether every autonomous action remained within the authorized procedure — process accountability across the full delegation chain.",
+    bench:"SCR ≥ 0.80 across representative trajectory datasets with human-annotated step labels",
+    lit:"https://arxiv.org/html/2603.14465v1" },
+
+  // aut-task: ISCR — intermediate step errors in multi-agent task delegation obscure which node exceeded its authority
+  { name:"Intermediate Step Correctness Rate", abbr:"ISCR", col:"task", cat:"safety", risk:"aut",
+    desc:"Proportion of intermediate reasoning steps in a multi-step agentic workflow that are logically correct and aligned with the task objective. In delegated multi-step task execution, incorrect intermediate steps are the mechanism by which a sub-agent's autonomous error propagates through the delegation chain — making it impossible to trace which node exceeded its authority.",
+    bench:"Study reports intermediate progress tracking without a fixed threshold",
+    lit:"https://arxiv.org/pdf/2412.17259" },
+
+  /* ── FINANCIAL HARM & MARKET INTEGRITY ───────────────────────────
+     Risk domain: Risks created when agentic AI systems influence, recommend, initiate,
+     or execute financial decisions — including payments, investments, credit, insurance,
+     pricing, and fraud controls. Covers direct financial loss, unauthorized transactions,
+     misaligned financial advice, discriminatory outcomes, and systemic market effects.
+  ────────────────────────────────────────────────────────────────── */
+
+  // fin-tool: Pass@k — stochastic failures on financial tool tasks directly create undisclosed transaction risk
+  { name:"Pass@k Reliability for Agentic Financial Tasks", abbr:"Pass@k", col:"tool", cat:"safety", risk:"fin",
+    desc:"Probability the agent succeeds at least once over k independent runs with identical inputs on financial tool tasks. Single-run reporting masks stochastic failures that, in financial contexts, correspond to unauthorized or failed transactions — FinRegLab specifically warns that AAI systems initiating payments and investments create hard questions about liability when those transactions go wrong.",
+    bench:"Pass@k ≥ 0.90 for k=5 repeated runs on identical financial tasks",
+    lit:"https://arxiv.org/pdf/2511.14136" },
+
+  // fin-tool: TESR — financial tool calls that fail to execute create payment errors or transaction voids with direct liability
+  { name:"Tool Execution Success Rate (TESR)", abbr:"TESR", col:"tool", cat:"safety", risk:"fin",
+    desc:"Proportion of tool-augmented runs where the financial tool call executes without error and returns a valid, parseable output. Execution failures in payment, investment, or funds-transfer tool calls create unresolved transaction states — FinRegLab identifies funds-transfer errors as one of the hardest liability questions when AAI actions go wrong.",
+    bench:"TESR ≥ 0.90 across tool-augmented tasks",
+    lit:"https://arxiv.org/html/2603.08262v1" },
+
+  // fin-tool: BPAR — policy-violating financial tool actions (unauthorized charges, bypassed fraud checks) are the direct financial harm vector
+  { name:"Business Policy Adherence Rate (BPAR)", abbr:"BPAR", col:"tool", cat:"safety", risk:"fin",
+    desc:"Proportion of multi-turn agentic interactions completed without any policy-violating financial tool action — such as unauthorized refunds, bypassed fraud verification, or payments outside eligibility windows. Policy violations here represent direct financial harm events: money moved without authorization or consumer protections bypassed.",
+    bench:"Multi-domain enterprise benchmark; GPT-4o <50% on retail domain",
+    lit:"https://arxiv.org/abs/2406.12045" },
+
+  // fin-tool: DAUII — financial decisions made on incomplete retrieved data cause mis-priced risk, wrong credit decisions, or incorrect investment actions
+  { name:"Decision Accuracy Under Incomplete Information", abbr:"DAUII", col:"tool", cat:"efficacy", risk:"fin",
+    desc:"Proportion of tasks where the agent correctly identifies missing financial information, retrieves it from external sources, and produces the correct decision. Financial decisions made on incomplete information — wrong credit scores, outdated market data, missing fraud signals — create direct consumer harm and regulatory exposure.",
+    bench:"Best-performing models ~46–48% accuracy on finance agent benchmarks",
+    lit:"https://arxiv.org/abs/2508.00828" },
+
+  // fin-tool: CpS — unsustainable cost-per-transaction is both an economic harm signal and an indicator of runaway financial agent behavior
+  { name:"Cost-per-Success (Cost-of-Pass)", abbr:"CpS", col:"tool", cat:"efficiency", risk:"fin",
+    desc:"Average operational cost to successfully complete one financial tool task. Runaway cost-per-transaction — caused by excessive retries, over-planning, or redundant API calls in payment or investment workflows — is both a direct financial harm to the deploying organization and an indicator of agent behavior outside its authorized operational scope.",
+    bench:"≤ $0.228/task; Efficient Agents reduced cost from $0.398 while retaining 96.7% of performance",
+    lit:"https://arxiv.org/html/2508.02694v1" },
+
+  // fin-comp: TCR-T — financial task completion via computer interface; failed completion = transaction not executed or misdirected
+  { name:"Task Completion Rate with Tool Use (TCR-T)", abbr:"TCR-T", col:"comp", cat:"efficacy", risk:"fin",
+    desc:"Whether the agent achieves the correct end goal after tool interactions — evaluated on final environment state. In financial computer-use contexts (banking portals, brokerage interfaces, insurance systems), task failure means a payment, investment, or claim action was not completed or was directed to the wrong recipient — creating direct financial loss or consumer harm.",
+    bench:"TCR-T ≥ 0.75 on multi-step tool-use benchmarks",
+    lit:"https://arxiv.org/abs/2507.21504" },
+
+  // fin-comp: USS — consumer financial satisfaction is a lagging signal of unauthorized actions or misaligned advice
+  { name:"User Satisfaction Score (USS)", abbr:"USS", col:"comp", cat:"efficacy", risk:"fin",
+    desc:"Standardized post-interaction user rating on usefulness, clarity, and responsiveness. In financial computer-use contexts, low satisfaction scores are a lagging consumer-harm signal: they indicate the agent's autonomous financial actions or recommendations did not match consumer expectations or intent, a precursor to dispute and redress escalation.",
+    bench:"Target USS ≥ 0.80 or CSAT ≥ 80%",
+    lit:"https://arxiv.org/abs/2308.08155" },
+
+  // fin-code: RNIR — silent regressions in financial code = undetected pricing errors, fraud control gaps, or incorrect transaction logic
+  { name:"Regression Non-Introduction Rate (RNIR)", abbr:"RNIR", col:"code", cat:"safety", risk:"fin",
+    desc:"Proportion of agent-generated code patches that fix the target issue without breaking any previously passing tests. In financial software, silent regressions introduced by autonomous code generation can corrupt pricing logic, disable fraud controls, or alter transaction authorization rules — harms that may not surface until significant financial loss has occurred.",
+    bench:"SWE-bench Verified: top models achieve ~70%+ FAIL-TO-PASS; PASS-TO-PASS degrades on complex edits",
+    lit:"https://arxiv.org/pdf/2310.06770" },
+
+  // fin-task: GCR — financial workflow goal failure means a transaction, credit decision, or investment action was not completed as authorized
+  { name:"Goal Completion Rate (GCR)", abbr:"GCR", col:"task", cat:"efficacy", risk:"fin",
+    desc:"Proportion of multi-step financial tasks where the agent achieves the intended goal without human override. In financial task execution — payment processing, loan origination, investment order routing — goal failure means either a transaction did not execute as authorized or was misdirected, with direct consumer financial impact.",
+    bench:"GCR ≥ 0.85 across a representative task suite; N ≥ 100 diverse scenarios",
+    lit:"https://arxiv.org/abs/2511.08242" },
+
+  // fin-task: ISCR — incorrect intermediate steps in financial workflows produce incorrect trade executions, mispriced products, or fraudulent authorizations
+  { name:"Intermediate Step Correctness Rate", abbr:"ISCR", col:"task", cat:"safety", risk:"fin",
+    desc:"Proportion of intermediate reasoning steps in a multi-step agentic financial workflow that are logically correct and aligned with the task objective. Incorrect intermediate steps in financial task execution — wrong eligibility checks, mispriced risk scores, skipped fraud controls — propagate errors into final financial actions that cause direct consumer harm.",
+    bench:"Study reports intermediate progress tracking without a fixed threshold",
+    lit:"https://arxiv.org/pdf/2412.17259" },
+
 ];
 /* ═══════════ GAPS ═══════════
    Gap cards for cells with no T&E metric mapped.
@@ -1112,7 +1296,9 @@ function splitMetricText(m) {
     third: 'Risk domain: Third-Party & Supply Chain. A gap here involves external tools, APIs, vendors, or data sources whose trustworthiness has not been verified.',
     agent: 'Risk domain: Agent-to-Agent. A gap here can cascade across agents, shared context, or multi-agent decision paths.',
     lps: 'Risk domain: Life & Patient Safety. A gap here can directly affect care delivery, cause physical harm to patients, or send errors downstream through clinical IT workflows.',
-    tnd: 'Risk domain: Technology & Data. A gap here puts at risk the confidentiality, integrity, or availability of health data and systems, including PHI exposure, data quality issues, security vulnerabilities, or undetectable AI influence on outputs.'
+    tnd: 'Risk domain: Technology & Data. A gap here puts at risk the confidentiality, integrity, or availability of health data and systems, including PHI exposure, data quality issues, security vulnerabilities, or undetectable AI influence on outputs.',
+    aut: 'Risk domain: Autonomy & Delegated Authority. A gap here means the agent\'s operational independence is not properly matched to the consequence of its actions — human oversight may be absent, action scope may exceed what was authorized, or accountability may be unclear across delegation chains.',
+    fin: 'Risk domain: Financial Harm & Market Integrity. A gap here means agentic financial actions — payments, investments, credit decisions, pricing — may cause direct loss, unauthorized money movement, discriminatory outcomes, or contribute to broader market instability.'
   }[m.risk] || `Risk domain: ${riskLabel(m.risk)}. This metric directly measures that risk area.`;
 
   let rationale = `${actionReason} ${riskReason}`;
@@ -1225,7 +1411,8 @@ function makeUniversalCard(m) {
 function riskLabel(r) {
   return { priv:'Data Privacy', liab:'Liability', inj:'Prompt Injection',
            mal:'Malicious Use', third:'Third-Party', agent:'Agent-to-Agent',
-           lps:'Life & Patient Safety', tnd:'Technology & Data' }[r] || r;
+           lps:'Life & Patient Safety', tnd:'Technology & Data',
+           aut:'Autonomy & Delegated Authority', fin:'Financial Harm & Market Integrity' }[r] || r;
 }
 
 function filterCat(btn, cat) {
