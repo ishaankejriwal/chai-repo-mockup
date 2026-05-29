@@ -92,7 +92,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .pill-task  { background: var(--task-bg);  color: var(--task-text);  border-color: var(--task-border); }
 .pill-all   { background: #f0eeff; color: #4c3b99; border-color: #c4b8f8; }
 .pill-gap   { background: var(--gap-bg);   color: var(--gap-text);   border-color: var(--gap-border); }
-@media (prefers-color-scheme: dark) { .pill-all { background: #1e1840; color: #b8a8f8; border-color: #3d3080; } }
+/* forced dark — always use dark pill-all */
+.pill-all   { background: #1e1840; color: #b8a8f8; border-color: #3d3080; }
 
 .matrix {
   display: grid;
@@ -186,8 +187,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .card-bench.data  { background: var(--data-bg); color: var(--data-text); }
 .card-bench.ctx   { background: var(--ctx-bg);  color: var(--ctx-text); }
 .card-bench.task  { background: var(--task-bg); color: var(--task-text); }
-.card-bench.all   { background: #f0eeff; color: #4c3b99; }
-@media (prefers-color-scheme: dark) { .card-bench.all { background: #1e1840; color: #b8a8f8; } }
+.card-bench.all   { background: #1e1840; color: #b8a8f8; }
+/* media query removed — always dark */
 
 .gap-card { border: 1px dashed var(--gap-border); border-radius: var(--radius-sm); padding: 6px 8px; margin-bottom: 5px; background: var(--gap-bg); cursor: pointer; transition: opacity .12s; display: none; }
 .gap-card:last-child { margin-bottom: 0; }
@@ -195,8 +196,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
 .gap-card.visible { display: block; }
 .gap-card.expanded .card-body { display: block; }
 .gap-card .card-name { color: var(--gap-text); }
-.gap-card .card-tag  { color: #b45309; font-size: 10px; }
-@media (prefers-color-scheme: dark) { .gap-card .card-tag { color: #ffffff; } }
+.gap-card .card-tag  { color: #ffffff; font-size: 10px; }
+/* removed media query — always dark */
 .gap-badge { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--gap-text); margin-right: 4px; opacity: .7; }
 
 .universal-section { margin-bottom: 32px; }
@@ -233,6 +234,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); padd
     --data-bg: #2d0a1a !important; --data-border: #7a2040 !important; --data-text: #f48fb1 !important; --data-mid: #e57399 !important;
     --ctx-bg:  #1a0d2d !important; --ctx-border: #5a2880 !important; --ctx-text: #ce93d8 !important; --ctx-mid: #ab47bc !important;
     --task-bg: #00201f !important; --task-border: #004d40 !important; --task-text: #80cbc4 !important; --task-mid: #00897b !important;
+
+    /* gap cards — force dark red regardless of OS color scheme */
+    --gap-bg: #2d0000 !important; --gap-border: #a00000 !important; --gap-text: #ffffff !important;
+
+    /* risk-row accent backgrounds */
+    --lps-bg: #3b0a0a !important; --lps-border: #7f1d1d !important; --lps-text: #fca5a5 !important; --lps-mid: #ef4444 !important;
+    --tnd-bg: #042f2e !important; --tnd-border: #0e7490 !important; --tnd-text: #67e8f9 !important; --tnd-mid: #06b6d4 !important;
+    --aut-bg: #2d1a00 !important; --aut-border: #92400e !important; --aut-text: #fcd34d !important; --aut-mid: #f59e0b !important;
+    --fin-bg: #052e16 !important; --fin-border: #166534 !important; --fin-text: #86efac !important; --fin-mid: #22c55e !important;
   }
 
   /* Apply the base background/text while preserving element backgrounds that use CSS variables */
@@ -1231,94 +1241,6 @@ const GAPS = [
     desc:"No metric measures whether downstream recipients — clinicians or other agents — can identify which portions of a handoff context package were AI-generated vs. sourced from verified records, a key traceability requirement." },
   { cell:"tnd-task",  name:"Task-Level Incident Detection Latency",
     desc:"No metric measures how quickly anomalous task execution outputs — indicative of a security incident or data integrity failure — are detected by monitoring systems, a gap in the incident detection and response framework." },
-
-  /* Autonomy & Delegated Authority gaps
-     Grounded in the domain definition: action velocity, permission escalation rate,
-     cross-boundary invocations, delegation depth, exception rates, and runtime
-     telemetry per CSA/NIST Agentic Profile. Gaps cover what existing metrics
-     (ESR, HTLCR, BPAR, GAS, PAS, SCR, EVBR, Pass@1) do not capture. */
-
-  // aut-tool: No metric captures how fast an agent is autonomously invoking tools — a core CSA/NIST telemetry signal
-  { cell:"aut-tool",  name:"Action Velocity Rate (Tool-Calling)",
-    desc:"No metric measures the rate at which an agent autonomously invokes tool calls per unit time — the CSA/NIST Agentic Profile specifically cites action velocity as a key telemetry signal for detecting whether an agent is drifting, compromised, or operating outside intended parameters. Spikes in velocity without corresponding task progress indicate scope creep or runaway behavior undetected by success-rate metrics alone." },
-  { cell:"aut-tool",  name:"Permission Escalation Rate (Tool Scope)",
-    desc:"No metric tracks whether an agent attempts to invoke tools with broader permissions than those granted for the current task — the CSA/NIST Agentic Profile calls out permission escalation rate as a primary telemetry indicator of unauthorized scope expansion in tool-use workflows. Existing metrics like BPAR and ESR measure outcomes, not whether the agent is actively probing for higher privileges." },
-  { cell:"aut-tool",  name:"Cross-Boundary Invocation Rate",
-    desc:"No metric counts how often a tool-calling agent calls across system or organizational trust boundaries — e.g. invoking external APIs, cross-tenant data stores, or out-of-scope services — relative to the total tool calls authorized for its task. The CSA/NIST Agentic Profile flags cross-boundary invocations as a distinct telemetry dimension that neither success rate nor policy adherence metrics capture." },
-
-  // aut-comp: No metric measures delegation depth in multi-agent computer-use chains
-  { cell:"aut-comp",  name:"Delegation Depth Compliance Rate",
-    desc:"No metric enforces or measures the number of sub-agent layers through which authority is delegated during a computer-use workflow — the CSA/NIST Agentic Profile identifies delegation depth as a key parameter requiring governance, since liability and accountability become progressively harder to assign with each additional delegation layer. GAS and HIR measure alignment and override rates but neither tracks how many hops a delegated instruction has traveled." },
-  { cell:"aut-comp",  name:"Runtime Telemetry Coverage Rate (Computer Use)",
-    desc:"No metric quantifies the proportion of autonomous computer-use actions that are observed and logged by a live telemetry layer capable of detecting behavioral drift in real time. The CSA/NIST Agentic Profile specifies runtime telemetry as a required control to detect whether an agent is drifting or compromised during execution — PRS and E2E-Trace measure platform uptime and post-hoc log completeness, not live behavioral drift detection." },
-
-  // aut-code: No metric captures exception rate during autonomous code execution as a scope signal
-  { cell:"aut-code",  name:"Autonomous Exception Rate (Code Execution)",
-    desc:"No metric tracks the frequency with which an autonomous code-execution agent encounters and handles exceptions without human review — the CSA/NIST Agentic Profile cites exception rates as a key telemetry indicator of abnormal agent behavior. High exception rates during code execution may indicate the agent is operating in unanticipated environments, attempting unauthorized operations, or drifting from its intended execution scope. Pass@1 and RNIR measure success and regression, not whether the execution path itself was within authorized parameters." },
-  { cell:"aut-code",  name:"Self-Modification and Scope Expansion Detection Rate",
-    desc:"No metric detects whether agent-generated code attempts to modify its own execution environment, extend its own permissions, or create persistent artifacts beyond the scope of the current task delegation — a critical autonomy boundary for code-execution agents that operate in shared or production environments." },
-
-  // aut-data: All cells are gaps — no metrics exist for data-interaction in this domain
-  { cell:"aut-data",  name:"Data Access Scope Creep Rate",
-    desc:"No metric tracks whether a data-interaction agent expands its query scope over the course of a task beyond what was authorized at delegation — querying additional record types, broader patient cohorts, or longer time windows than specified in the original task. The CSA/NIST Agentic Profile identifies resource access as a governed dimension of autonomy; no T&E metric currently captures drift in data scope during task execution." },
-  { cell:"aut-data",  name:"Unsupervised Data Write Rate",
-    desc:"No metric measures the proportion of data writes or mutations performed by an agent without any human approval step — a core autonomy boundary for data-interaction agents operating on EHR or operational records. The gap is particularly acute for agents with write access: the absence of a human checkpoint before data modification is an irreversibility risk that no existing T&E metric in this domain covers." },
-
-  // aut-ctx: All cells are gaps — no metrics exist for context & handoff in this domain
-  { cell:"aut-ctx",   name:"Autonomous Scope Elevation via Context Injection",
-    desc:"No metric detects whether an agent autonomously elevates its own operational scope by inserting additional permissions, task objectives, or tool-access claims into the context package it passes to a downstream agent or system — a delegation-chain attack vector not captured by any existing context-integrity metric." },
-  { cell:"aut-ctx",   name:"Handoff Authorization Verification Rate",
-    desc:"No metric verifies that every context handoff from one agent to another was explicitly authorized by a human or governance policy at the appropriate delegation level — the CSA/NIST Agentic Profile requires that every autonomous action be traceable back to a responsible human authority, but no T&E metric currently confirms authorization at each context-transfer point in multi-agent workflows." },
-
-  // aut-task: Partial coverage — gaps focus on what PAS, SCR, ISCR do not capture
-  { cell:"aut-task",  name:"Unauthorized Sub-Task Spawning Rate",
-    desc:"No metric counts how often a task-execution agent autonomously initiates sub-tasks — spawning new agents, creating new workflows, or issuing orders — that were not part of the original delegated task plan. PAS measures adherence to a known plan; this gap addresses the scenario where the agent expands its own task tree without authorization, which PAS cannot detect if no plan was defined for the new branch." },
-  { cell:"aut-task",  name:"Time-Horizon Overrun Rate",
-    desc:"No metric enforces a maximum execution time horizon per delegated task, or measures how often agents continue operating beyond the intended time window for their authorization. The CSA/NIST Agentic Profile lists time horizon as a governed dimension of autonomy — an agent that keeps running beyond its authorized window accumulates actions and resource accesses that were never part of the original delegation, a gap not addressed by turn limits or step correctness metrics." },
-
-  /* Financial Harm & Market Integrity gaps
-     Grounded in the domain definition: consumer financial autonomy, informed consent,
-     transaction authorization, payment errors, discriminatory financial outcomes,
-     dispute and redress, agent-driven fraud exposure, financial crime workflows,
-     and systemic risks from high-speed autonomous action per FinRegLab. */
-
-  // fin-tool: Existing metrics cover reliability and policy adherence; gaps cover discrimination, consent, and market-integrity dimensions
-  { cell:"fin-tool",  name:"Discriminatory Financial Outcome Rate (Tool-Calling)",
-    desc:"No metric evaluates whether an agent's autonomous tool-calling decisions — credit denials, insurance pricing calls, loan eligibility lookups — produce systematically different outcomes for protected demographic groups. FinRegLab specifically warns that AAI systems making financial decisions raise fair lending and fair credit concerns; existing fairness metrics (PPR, FCSR) are in the universal section and are not calibrated to the specific regulatory definitions used in financial services (ECOA, FCRA, disparate impact doctrine)." },
-  { cell:"fin-tool",  name:"Informed and Ongoing Consent Verification Rate",
-    desc:"No metric tracks whether a tool-calling financial agent verified that the consumer's consent for the current action remains valid, current, and not revoked — FinRegLab identifies informed and ongoing consent as a distinct financial autonomy requirement for AAI systems. Payment or investment tool calls executed on stale or revoked consent create unauthorized transaction liability not captured by BPAR or TESR." },
-  { cell:"fin-tool",  name:"Fraud and Scam Exposure Rate",
-    desc:"No metric measures how often an agent's tool-calling behavior exposes a consumer to a fraud or scam event — either by routing a payment to an adversarially injected destination, failing to apply a required fraud check, or being redirected via a prompt injection that substitutes a fraudulent beneficiary. FinRegLab highlights agent-driven fraud exposure as a distinct consumer harm category separate from operational errors." },
-
-  // fin-comp: Existing metrics cover task completion and satisfaction; gaps cover market-integrity and dispute-redress dimensions
-  { cell:"fin-comp",  name:"Dispute and Redress Pathway Availability Rate",
-    desc:"No metric measures whether a financial computer-use agent ensures that consumers are informed of and provided access to dispute and redress mechanisms after an autonomous financial action. FinRegLab identifies consumer dispute rights as a foundational financial protection that AAI systems must preserve — an agent that completes a transaction without surfacing redress options satisfies task completion metrics but fails this consumer protection requirement." },
-  { cell:"fin-comp",  name:"High-Speed Action Concentration Rate",
-    desc:"No metric detects whether a financial computer-use agent — or a fleet of such agents — is executing financial actions at a velocity or concentration that could constitute a market herding, volatility, or liquidity shock event. FinRegLab specifically calls out systemic risks from high-speed autonomous action as a financial market integrity concern that individual transaction-level metrics cannot surface." },
-
-  // fin-code: Existing metrics cover regression and code correctness; gaps cover financial-crime and model-risk dimensions
-  { cell:"fin-code",  name:"Financial Crime Control Bypass Rate",
-    desc:"No metric tests whether agent-generated financial code — transaction routing logic, AML screening filters, sanctions-check integrations — can be bypassed or degraded by adversarial inputs or autonomous code modifications. Financial crime workflow controls (AML, KYC, OFAC) are a distinct code-level risk category in this domain; RNIR measures regression-free patching but does not specifically test whether financial crime controls survive autonomous code changes." },
-  { cell:"fin-code",  name:"Model Risk Disclosure Completeness Rate",
-    desc:"No metric evaluates whether code generated for financial models — credit scoring, pricing, risk-stratification — produces outputs accompanied by the model documentation, uncertainty bounds, and limitation disclosures required under financial model risk management standards (SR 11-7). Autonomous code generation in regulated financial environments introduces model risk that code correctness metrics alone cannot assess." },
-
-  // fin-data: All cells are gaps — no metrics exist for data-interaction in this domain
-  { cell:"fin-data",  name:"Financial Data Accuracy and Currency Rate",
-    desc:"No metric verifies that the financial data an agent reads and acts on — account balances, credit scores, market prices, insurance policy status — is accurate and current at the moment of the decision. Stale or incorrect financial data directly causes mispriced risk, unauthorized overdrafts, or wrong investment actions; no T&E metric in this domain currently captures data freshness or accuracy as a pre-decision control for financial data-interaction agents." },
-  { cell:"fin-data",  name:"Consumer Financial Data Minimization Rate",
-    desc:"No metric tracks whether a financial data-interaction agent retrieves only the consumer financial data strictly required for the current authorized task — excess retrieval of credit history, income, or behavioral data beyond task scope creates consumer harm and regulatory exposure under laws such as GLBA, FCRA, and CCPA, none of which are directly addressed by any existing T&E metric in this framework." },
-
-  // fin-ctx: All cells are gaps — no metrics exist for context & handoff in this domain
-  { cell:"fin-ctx",   name:"Transaction Authorization Context Integrity Rate",
-    desc:"No metric verifies that the authorization context passed between agents in a financial workflow — the consumer identity, consent record, transaction parameters, and compliance flags — arrives at the executing agent unchanged and complete. A tampered or truncated authorization context package can cause an agent to execute a transaction with the wrong beneficiary, wrong amount, or without required consent, a financial harm vector with no existing T&E coverage." },
-  { cell:"fin-ctx",   name:"Regulatory Compliance Context Preservation Rate",
-    desc:"No metric measures whether compliance-relevant context — applicable regulations, product disclosures, required warnings, consumer eligibility flags — is correctly preserved and surfaced at each agent-to-agent handoff in a financial workflow. FinRegLab identifies consumer disclosure and compliance as a financial protection that must travel with the transaction context; truncation or omission at handoff creates undisclosed regulatory exposure." },
-
-  // fin-task: Existing metrics cover goal completion and intermediate steps; gaps cover wealth-building harm and systemic market dimensions
-  { cell:"fin-task",  name:"Wealth-Building Harm Rate",
-    desc:"No metric evaluates whether an agent's autonomous financial task execution — investment recommendations, retirement allocation decisions, debt repayment sequencing — produces outcomes that are systematically misaligned with the consumer's long-term financial wellbeing. FinRegLab identifies wealth-building decisions as a distinct high-stakes financial harm category where short-term task completion metrics (GCR, ISCR) cannot capture whether the agent's actions served the consumer's actual financial interests." },
-  { cell:"fin-task",  name:"Tacit Collusion and Market Herding Detection Rate",
-    desc:"No metric measures whether the aggregate output of multiple financial task-execution agents — pricing decisions, portfolio allocations, trading actions — exhibits coordination patterns consistent with tacit collusion, herding, or liquidity concentration that could destabilize financial markets. FinRegLab specifically identifies herding, tacit collusion, and liquidity shocks as systemic financial market integrity risks from AAI systems; these emerge at the population level and cannot be detected by any individual-transaction metric in the current framework." },
 ];
 
 /* ── State ── */
